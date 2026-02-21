@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/block-orchestrator-tools.js"
+            "command": "node .claude/hooks/block-orchestrator-tools.cjs"
           }
         ]
       },
@@ -14,19 +14,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/enforce-bead-for-supervisor.js"
+            "command": "node .claude/hooks/enforce-bead-for-supervisor.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/enforce-sequential-dispatch.js"
+            "command": "node .claude/hooks/enforce-sequential-dispatch.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/remind-inprogress.js"
+            "command": "node .claude/hooks/remind-inprogress.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/inject-discipline-reminder.js"
+            "command": "node .claude/hooks/inject-discipline-reminder.cjs"
           }
         ]
       },
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/enforce-branch-before-edit.js"
+            "command": "node .claude/hooks/enforce-branch-before-edit.cjs"
           }
         ]
       },
@@ -44,7 +44,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/enforce-branch-before-edit.js"
+            "command": "node .claude/hooks/enforce-branch-before-edit.cjs"
           }
         ]
       },
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/validate-epic-close.js"
+            "command": "node .claude/hooks/validate-epic-close.cjs"
           }
         ]
       }
@@ -64,11 +64,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/enforce-concise-response.js"
+            "command": "node .claude/hooks/enforce-concise-response.cjs"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/log-dispatch-prompt.js",
+            "command": "node .claude/hooks/log-dispatch-prompt.cjs",
             "timeout": 10
           }
         ]
@@ -78,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/memory-capture.js",
+            "command": "node .claude/hooks/memory-capture.cjs",
             "timeout": 10
           }
         ]
@@ -89,7 +89,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/validate-completion.js"
+            "command": "node .claude/hooks/validate-completion.cjs"
           }
         ]
       }
@@ -99,7 +99,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session-start.js"
+            "command": "node .claude/hooks/session-start.cjs"
           }
         ]
       }
@@ -109,7 +109,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/clarify-vague-request.js"
+            "command": "node .claude/hooks/clarify-vague-request.cjs"
           }
         ]
       }
@@ -119,7 +119,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/nudge-claude-md-update.js"
+            "command": "node .claude/hooks/nudge-claude-md-update.cjs"
           }
         ]
       }
