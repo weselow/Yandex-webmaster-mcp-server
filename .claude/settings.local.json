@@ -10,7 +10,12 @@
       "Bash(echo EXIT CODE: $?:*)",
       "Bash(git:*)",
       "Bash(cd M:/repos/Yandex-webmaster-mcp-server && pnpm tsc --noEmit 2>&1)",
-      "WebFetch(domain:yandex.com)"
+      "WebFetch(domain:yandex.com)",
+      "WebFetch(domain:yandex.ru)",
+      "WebSearch",
+      "Bash(cd \"M:/repos/Yandex-webmaster-mcp-server\" && pnpm test 2>&1)",
+      "Bash(echo EXIT_CODE: $?:*)",
+      "Bash(echo EXIT: $?:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

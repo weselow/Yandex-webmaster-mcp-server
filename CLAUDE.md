@@ -6,10 +6,7 @@
 
 ## Tech Stack
 
-- **Languages**: TypeScript
-- **Runtime**: Node.js 18+
-- **Frameworks**: @modelcontextprotocol/sdk, Zod
-- **Tooling**: ESLint, Prettier, Jest/Vitest
+<!-- Populated by discovery agent -->
 
 ## Your Identity
 
@@ -140,7 +137,7 @@ bd dep relate {NEW_ID} {OLD_ID}  # Traceability link
 
 ## Knowledge Base
 
-Search before investigating unfamiliar code: `.beads/memory/recall.sh "keyword"`
+Search before investigating unfamiliar code: `node .beads/memory/recall.cjs "keyword"`
 
 Log learnings: `bd comment {ID} "LEARNED: [insight]"` — captured automatically to `.beads/memory/knowledge.jsonl`
 
@@ -148,7 +145,6 @@ Log learnings: `bd comment {ID} "LEARNED: [insight]"` — captured automatically
 
 <!-- Populated by discovery agent -->
 - merge-supervisor
-- node-backend-supervisor
 
 ## Current State
 
@@ -157,3 +153,4 @@ ORCHESTRATOR: Update this section as the project evolves.
 Include: active work, recent decisions, known issues, architectural notes.
 Keep it concise — pointers to files are better than duplicated content.
 -->
+

@@ -161,7 +161,7 @@ try {
         output.push(`  [${typeLabel}] ${snippet}  (${e.source})`);
       }
       output.push('');
-      output.push('  Search: .beads/memory/recall.sh "keyword"');
+      output.push('  Search: node .beads/memory/recall.cjs "keyword"');
     }
   }
 } catch {

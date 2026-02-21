@@ -3,58 +3,34 @@
     "PreToolUse": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/block-orchestrator-tools.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/block-orchestrator-tools.cjs"}
         ]
       },
       {
         "matcher": "Task",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/enforce-bead-for-supervisor.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/enforce-sequential-dispatch.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/remind-inprogress.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/inject-discipline-reminder.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/enforce-bead-for-supervisor.cjs"},
+          {"type": "command", "command": "node .claude/hooks/enforce-sequential-dispatch.cjs"},
+          {"type": "command", "command": "node .claude/hooks/remind-inprogress.cjs"},
+          {"type": "command", "command": "node .claude/hooks/inject-discipline-reminder.cjs"}
         ]
       },
       {
         "matcher": "Edit",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/enforce-branch-before-edit.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/enforce-branch-before-edit.cjs"}
         ]
       },
       {
         "matcher": "Write",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/enforce-branch-before-edit.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/enforce-branch-before-edit.cjs"}
         ]
       },
       {
         "matcher": "Bash",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/validate-epic-close.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/validate-epic-close.cjs"}
         ]
       }
     ],
@@ -62,71 +38,44 @@
       {
         "matcher": "Task",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/enforce-concise-response.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/log-dispatch-prompt.cjs",
-            "timeout": 10
-          }
+          {"type": "command", "command": "node .claude/hooks/enforce-concise-response.cjs"},
+          {"type": "command", "command": "node .claude/hooks/log-dispatch-prompt.cjs", "timeout": 10}
         ]
       },
       {
         "matcher": "Bash",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/memory-capture.cjs",
-            "timeout": 10
-          }
+          {"type": "command", "command": "node .claude/hooks/memory-capture.cjs", "timeout": 10}
         ]
       }
     ],
     "SubagentStop": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/validate-completion.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/validate-completion.cjs"}
         ]
       }
     ],
     "SessionStart": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session-start.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/session-start.cjs"}
         ]
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/clarify-vague-request.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/clarify-vague-request.cjs"}
         ]
       }
     ],
     "PreCompact": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/nudge-claude-md-update.cjs"
-          }
+          {"type": "command", "command": "node .claude/hooks/nudge-claude-md-update.cjs"}
         ]
       }
     ]
-  },
-  "enabledPlugins": {
-    "api-scaffolding@claude-code-workflows": true,
-    "backend-development@claude-code-workflows": true
   }
 }
