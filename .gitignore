@@ -3,3 +3,15 @@
 
 # MCP config (user-specific paths)
 .mcp.json
+
+# Build output
+dist/
+
+# Environment variables
+.env
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Dependencies
+node_modules/
