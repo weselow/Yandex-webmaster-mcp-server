@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "beads-orchestration": "github:weselow/The-Claude-Protocol"
+  }
+}

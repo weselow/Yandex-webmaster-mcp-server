@@ -1,0 +1,5 @@
+# Beads task tracking (ephemeral)
+.beads/
+
+# MCP config (user-specific paths)
+.mcp.json
