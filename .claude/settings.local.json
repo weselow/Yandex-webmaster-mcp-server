@@ -9,7 +9,8 @@
       "Bash(cd \"M:/repos/Yandex-webmaster-mcp-server\" && pnpm tsc --noEmit 2>&1)",
       "Bash(echo EXIT CODE: $?:*)",
       "Bash(git:*)",
-      "Bash(cd M:/repos/Yandex-webmaster-mcp-server && pnpm tsc --noEmit 2>&1)"
+      "Bash(cd M:/repos/Yandex-webmaster-mcp-server && pnpm tsc --noEmit 2>&1)",
+      "WebFetch(domain:yandex.com)"
     ]
   },
   "enableAllProjectMcpServers": true,
