@@ -5,7 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { injectText, execCommand, getProjectDir, runHook } = require('./hook-utils');
+const { injectText, execCommand, getProjectDir, runHook } = require('./hook-utils.cjs');
 
 runHook('session-start', () => {
 const projectDir = getProjectDir();
