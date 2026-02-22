@@ -1,0 +1,10 @@
+src/
+tests/
+.claude/
+.beads/
+.worktrees/
+.env
+.env.example
+tsconfig.json
+vitest.config.ts
+*.test.ts

@@ -2,6 +2,8 @@
   "name": "yandex-webmaster-mcp-server",
   "version": "1.0.0",
   "type": "module",
+  "description": "MCP-сервер для Yandex Webmaster API v4 — 31 инструмент для управления сайтами через Model Context Protocol",
+  "keywords": ["mcp", "yandex", "webmaster", "seo", "api", "mcp-server", "model-context-protocol"],
   "main": "dist/index.js",
   "bin": {
     "yandex-webmaster-mcp-server": "dist/index.js"
@@ -11,8 +13,16 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm build"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weselow/yandex-webmaster-mcp-server.git"
+  },
+  "author": "weselow",
+  "license": "MIT",
+  "files": ["dist", "README.md", "LICENSE"],
   "engines": {
     "node": ">=18"
   },
