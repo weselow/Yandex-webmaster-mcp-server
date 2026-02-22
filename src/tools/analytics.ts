@@ -27,12 +27,12 @@ export function registerAnalyticsTools(
     'Get search query analytics history',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().describe('End date (YYYY-MM-DD)'),
       query_indicator: queryIndicatorSchema,
       device_type_indicator: deviceTypeSchema,
-      offset: z.number().int().min(0).optional().describe('Number of results to skip'),
-      limit: z.number().int().min(1).max(500).optional().describe('Maximum number of results'),
+      offset: z.number().int().min(0).optional().describe('Offset'),
+      limit: z.number().int().min(1).max(500).optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -57,12 +57,12 @@ export function registerAnalyticsTools(
     'Get popular search queries',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().describe('End date (YYYY-MM-DD)'),
       query_indicator: queryIndicatorSchema,
       device_type_indicator: deviceTypeSchema,
-      offset: z.number().int().min(0).optional().describe('Number of results to skip'),
-      limit: z.number().int().min(1).max(500).optional().describe('Maximum number of results'),
+      offset: z.number().int().min(0).optional().describe('Offset'),
+      limit: z.number().int().min(1).max(500).optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -89,8 +89,8 @@ export function registerAnalyticsTools(
     'Get external link samples',
     {
       host_id: optionalHostIdSchema,
-      offset: z.number().int().min(0).optional().describe('Number of results to skip'),
-      limit: z.number().int().min(1).max(500).optional().describe('Maximum number of results'),
+      offset: z.number().int().min(0).optional().describe('Offset'),
+      limit: z.number().int().min(1).max(500).optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -113,8 +113,8 @@ export function registerAnalyticsTools(
     'Get SQI history over time',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().optional().describe('End date (YYYY-MM-DD)'),
     },
     async (params) => {
       try {
@@ -137,8 +137,8 @@ export function registerAnalyticsTools(
     'Get external links history over time',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().optional().describe('End date (YYYY-MM-DD)'),
     },
     async (params) => {
       try {
@@ -158,12 +158,12 @@ export function registerAnalyticsTools(
 
   server.tool(
     'ywm_get_query_history',
-    'Get search query history for a specific query',
+    'Get search query history',
     {
       host_id: optionalHostIdSchema,
-      query_id: z.string().describe('Query ID to get history for'),
-      date_from: z.string().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().describe('End date in YYYY-MM-DD format'),
+      query_id: z.string().describe('Query ID'),
+      date_from: z.string().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().describe('End date (YYYY-MM-DD)'),
       query_indicator: queryIndicatorSchema,
       device_type_indicator: deviceTypeSchema,
     },
@@ -187,18 +187,18 @@ export function registerAnalyticsTools(
 
   server.tool(
     'ywm_query_analytics',
-    'Run query analytics with filters (POST endpoint that reads analytics data)',
+    'Run query analytics with filters',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().describe('End date (YYYY-MM-DD)'),
       device_type_indicator: z.string().optional().describe('Device type filter'),
       text_indicator: z.string().optional().describe('Text indicator'),
       region_ids: z.array(z.number()).optional().describe('Region IDs to filter by'),
       filters: z.record(z.unknown()).optional().describe('Additional filters'),
       sort_by_date: z.string().optional().describe('Sort by date direction'),
-      offset: z.number().int().min(0).optional().describe('Number of results to skip'),
-      limit: z.number().int().min(1).max(500).optional().describe('Maximum number of results'),
+      offset: z.number().int().min(0).optional().describe('Offset'),
+      limit: z.number().int().min(1).max(500).optional().describe('Max results'),
     },
     async (params) => {
       try {

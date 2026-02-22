@@ -21,7 +21,7 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_get_recrawl_quota',
-    'Get recrawl quota information for a host',
+    'Get recrawl quota',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -36,7 +36,7 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_list_recrawl_tasks',
-    'List recrawl tasks for a host',
+    'List recrawl tasks',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -51,10 +51,10 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_submit_recrawl',
-    'Submit a URL for recrawling (destructive action — consumes quota)',
+    'Submit URL for recrawling (consumes quota)',
     {
       host_id: optionalHostIdSchema,
-      url: z.string().describe('URL to submit for recrawling'),
+      url: z.string().describe('URL to recrawl'),
     },
     async (params) => {
       try {
@@ -71,11 +71,11 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_get_original_texts',
-    'List original texts for a host',
+    'List original texts',
     {
       host_id: optionalHostIdSchema,
-      offset: z.number().int().min(0).optional().describe('Number of results to skip'),
-      limit: z.number().int().min(1).max(500).optional().describe('Maximum number of results to return'),
+      offset: z.number().int().min(0).optional().describe('Offset'),
+      limit: z.number().int().min(1).max(500).optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -93,10 +93,10 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_add_original_text',
-    'Add an original text for a host',
+    'Add original text',
     {
       host_id: optionalHostIdSchema,
-      content: z.string().describe('Original text content to add'),
+      content: z.string().describe('Text content'),
     },
     async (params) => {
       try {
@@ -114,7 +114,7 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
     'Delete an original text',
     {
       host_id: optionalHostIdSchema,
-      text_id: z.string().describe('Original text ID to delete'),
+      text_id: z.string().describe('Text ID'),
     },
     async (params) => {
       try {
@@ -129,7 +129,7 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_get_original_text_quota',
-    'Get original text quota information for a host',
+    'Get original text quota',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -146,10 +146,10 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_get_recrawl_task',
-    'Get details of a specific recrawl task',
+    'Get recrawl task details',
     {
       host_id: optionalHostIdSchema,
-      task_id: z.string().describe('Recrawl task ID'),
+      task_id: z.string().describe('Task ID'),
     },
     async (params) => {
       try {
@@ -166,7 +166,7 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_list_feeds',
-    'List all feeds for a host',
+    'List all feeds',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -181,10 +181,10 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_start_feed_upload',
-    'Start a feed upload (destructive action)',
+    'Start feed upload',
     {
       host_id: optionalHostIdSchema,
-      url: z.string().describe('Feed URL to upload'),
+      url: z.string().describe('Feed URL'),
     },
     async (params) => {
       try {
@@ -214,10 +214,10 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_batch_add_feeds',
-    'Batch add multiple feeds (destructive action)',
+    'Batch add feeds',
     {
       host_id: optionalHostIdSchema,
-      urls: z.array(z.string()).describe('List of feed URLs to add'),
+      urls: z.array(z.string()).describe('Feed URLs'),
     },
     async (params) => {
       try {
@@ -232,10 +232,10 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
 
   server.tool(
     'ywm_batch_remove_feeds',
-    'Batch remove multiple feeds (destructive action)',
+    'Batch remove feeds',
     {
       host_id: optionalHostIdSchema,
-      urls: z.array(z.string()).describe('List of feed URLs to remove'),
+      urls: z.array(z.string()).describe('Feed URLs'),
     },
     async (params) => {
       try {

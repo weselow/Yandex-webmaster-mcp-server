@@ -6,7 +6,7 @@ import { optionalHostIdSchema } from '../utils/schemas.js';
 export function registerCoreTools(server: McpServer, client: YandexWebmasterClient): void {
   server.tool(
     'ywm_get_user',
-    'Get current Yandex Webmaster user info (user ID)',
+    'Get current user info (user ID)',
     {},
     async () => {
       try {
@@ -21,7 +21,7 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_list_hosts',
-    'List all hosts (sites) registered in the Yandex Webmaster account',
+    'List all registered hosts (sites)',
     {},
     async () => {
       try {
@@ -36,7 +36,7 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_get_host',
-    'Get details of a specific host (site) by its ID',
+    'Get host details by ID',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -52,8 +52,8 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_add_host',
-    'Add a new host (site) to the Yandex Webmaster account',
-    { host_url: z.string().describe('URL of the host to add, e.g. https://example.com') },
+    'Add a new host (site)',
+    { host_url: z.string().describe('Host URL (e.g. https://example.com)') },
     async (params) => {
       try {
         const result = await client.addHost(params.host_url);
@@ -67,8 +67,8 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_delete_host',
-    'Delete a host (site) from the Yandex Webmaster account',
-    { host_id: z.string().describe('Host ID to delete') },
+    'Delete a host (site)',
+    { host_id: z.string().describe('Host ID') },
     async (params) => {
       try {
         await client.deleteHost(params.host_id);
@@ -82,7 +82,7 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_get_host_summary',
-    'Get summary statistics for a host including SQI, page counts, and site problems',
+    'Get host summary (SQI, pages, problems)',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -98,7 +98,7 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_get_verification',
-    'Get the verification status of a host',
+    'Get host verification status',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -114,10 +114,10 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_verify_host',
-    'Start the verification process for a host using the specified method',
+    'Start host verification',
     {
       host_id: optionalHostIdSchema,
-      verification_type: z.string().describe('Verification method (e.g. DNS, HTML_FILE, META_TAG)'),
+      verification_type: z.string().describe('Method (DNS, HTML_FILE, META_TAG)'),
     },
     async (params) => {
       try {
@@ -133,7 +133,7 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_get_diagnostics',
-    'Get site diagnostics and detected problems for a host',
+    'Get site diagnostics and problems',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -149,7 +149,7 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
 
   server.tool(
     'ywm_list_owners',
-    'List host owners and their verification details',
+    'List host owners',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {

@@ -8,7 +8,7 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_list_sitemaps',
-    'List all sitemaps for a host',
+    'List all sitemaps',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -24,7 +24,7 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_sitemap',
-    'Get details of a specific sitemap',
+    'Get sitemap details',
     {
       host_id: optionalHostIdSchema,
       sitemap_id: z.string().describe('Sitemap ID'),
@@ -65,7 +65,7 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
     'Delete a sitemap',
     {
       host_id: optionalHostIdSchema,
-      sitemap_id: z.string().describe('Sitemap ID to delete'),
+      sitemap_id: z.string().describe('Sitemap ID'),
     },
     async (params) => {
       try {
@@ -83,11 +83,11 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_indexing_history',
-    'Get indexing history over time for a host',
+    'Get indexing history over time',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().optional().describe('End date (YYYY-MM-DD)'),
     },
     async (params) => {
       try {
@@ -108,11 +108,11 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_search_urls',
-    'Get URLs found in search for a host',
+    'Get URLs found in search',
     {
       host_id: optionalHostIdSchema,
-      offset: z.number().optional().describe('Number of results to skip'),
-      limit: z.number().optional().describe('Maximum number of results to return'),
+      offset: z.number().optional().describe('Offset'),
+      limit: z.number().optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -133,11 +133,11 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_important_urls',
-    'Get important URLs with issues for a host',
+    'Get important URLs with issues',
     {
       host_id: optionalHostIdSchema,
-      offset: z.number().optional().describe('Number of results to skip'),
-      limit: z.number().optional().describe('Maximum number of results to return'),
+      offset: z.number().optional().describe('Offset'),
+      limit: z.number().optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -158,11 +158,11 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_search_events_samples',
-    'Get pages excluded from search with reasons (LOW_QUALITY, DUPLICATE, etc.)',
+    'Get excluded pages (LOW_QUALITY, DUPLICATE, etc.)',
     {
       host_id: optionalHostIdSchema,
-      offset: z.number().optional().describe('Number of results to skip'),
-      limit: z.number().optional().describe('Maximum number of results to return'),
+      offset: z.number().optional().describe('Offset'),
+      limit: z.number().optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -184,8 +184,8 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
     'Get search events history over time',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().optional().describe('End date (YYYY-MM-DD)'),
     },
     async (params) => {
       try {
@@ -206,11 +206,11 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_search_urls_history',
-    'Get search URLs in-search history over time',
+    'Get search URLs history over time',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().optional().describe('End date (YYYY-MM-DD)'),
     },
     async (params) => {
       try {
@@ -231,11 +231,11 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_indexing_samples',
-    'Get indexing samples with HTTP codes for a host',
+    'Get indexing samples with HTTP codes',
     {
       host_id: optionalHostIdSchema,
-      offset: z.number().optional().describe('Number of results to skip'),
-      limit: z.number().optional().describe('Maximum number of results to return'),
+      offset: z.number().optional().describe('Offset'),
+      limit: z.number().optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -259,8 +259,8 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
     'Get important URLs history over time',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().optional().describe('End date (YYYY-MM-DD)'),
     },
     async (params) => {
       try {
@@ -281,11 +281,11 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_broken_internal_links',
-    'Get broken internal link samples for a host',
+    'Get broken internal link samples',
     {
       host_id: optionalHostIdSchema,
-      offset: z.number().optional().describe('Number of results to skip'),
-      limit: z.number().optional().describe('Maximum number of results to return'),
+      offset: z.number().optional().describe('Offset'),
+      limit: z.number().optional().describe('Max results'),
     },
     async (params) => {
       try {
@@ -307,8 +307,8 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
     'Get broken internal links history over time',
     {
       host_id: optionalHostIdSchema,
-      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
-      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+      date_from: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      date_to: z.string().optional().describe('End date (YYYY-MM-DD)'),
     },
     async (params) => {
       try {
@@ -329,7 +329,7 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_list_user_sitemaps',
-    'List user-added sitemaps for a host',
+    'List user-added sitemaps',
     { host_id: optionalHostIdSchema },
     async (params) => {
       try {
@@ -345,7 +345,7 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
 
   server.tool(
     'ywm_get_user_sitemap',
-    'Get details of a specific user-added sitemap',
+    'Get user-added sitemap details',
     {
       host_id: optionalHostIdSchema,
       sitemap_id: z.string().describe('Sitemap ID'),
