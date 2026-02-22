@@ -44,9 +44,9 @@ describe('Server integration', () => {
     expect(server).toBeDefined();
   });
 
-  it('registers all 31 tools', async () => {
+  it('registers all 46 tools', async () => {
     const { tools } = await mcpClient.listTools();
-    expect(tools).toHaveLength(31);
+    expect(tools).toHaveLength(46);
   });
 
   describe('core tools are registered', () => {
@@ -76,10 +76,18 @@ describe('Server integration', () => {
       'ywm_get_sitemap',
       'ywm_add_sitemap',
       'ywm_delete_sitemap',
-      'ywm_get_indexing_status',
       'ywm_get_indexing_history',
       'ywm_get_search_urls',
       'ywm_get_important_urls',
+      'ywm_get_search_events_samples',
+      'ywm_get_search_events_history',
+      'ywm_get_search_urls_history',
+      'ywm_get_indexing_samples',
+      'ywm_get_important_urls_history',
+      'ywm_get_broken_internal_links',
+      'ywm_get_broken_links_history',
+      'ywm_list_user_sitemaps',
+      'ywm_get_user_sitemap',
     ];
 
     it.each(contentTools)('registers %s', async (toolName) => {
@@ -93,10 +101,11 @@ describe('Server integration', () => {
     const analyticsTools = [
       'ywm_get_search_queries',
       'ywm_get_popular_queries',
-      'ywm_get_backlinks',
       'ywm_get_external_links',
-      'ywm_get_sqi',
       'ywm_get_sqi_history',
+      'ywm_get_external_links_history',
+      'ywm_get_query_history',
+      'ywm_query_analytics',
     ];
 
     it.each(analyticsTools)('registers %s', async (toolName) => {
@@ -115,6 +124,12 @@ describe('Server integration', () => {
       'ywm_add_original_text',
       'ywm_delete_original_text',
       'ywm_get_original_text_quota',
+      'ywm_get_recrawl_task',
+      'ywm_list_feeds',
+      'ywm_start_feed_upload',
+      'ywm_get_feed_upload_status',
+      'ywm_batch_add_feeds',
+      'ywm_batch_remove_feeds',
     ];
 
     it.each(actionTools)('registers %s', async (toolName) => {

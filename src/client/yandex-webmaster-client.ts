@@ -11,9 +11,7 @@ import type {
   ImportantUrlList,
   SearchQueryResult,
   SearchQueryParams,
-  BacklinksInfo,
   ExternalLinkList,
-  SQIInfo,
   SQIHistory,
   DiagnosticsInfo,
   RecrawlQuota,
@@ -23,6 +21,13 @@ import type {
   OriginalTexts,
   OriginalTextQuota,
   VerificationInfo,
+  OwnerList,
+  SearchEventList,
+  BrokenLinkList,
+  FeedList,
+  FeedUploadStatus,
+  QueryAnalyticsRequest,
+  QueryAnalyticsResult,
   DateRange,
   Pagination,
 } from './types.js';
@@ -143,6 +148,11 @@ export class YandexWebmasterClient {
     await this.request<void>('DELETE', fullPath);
   }
 
+  private async delWithBody<T>(path: string, body: unknown): Promise<T> {
+    const fullPath = await this.userPath(path);
+    return this.request<T>('DELETE', fullPath, body);
+  }
+
   // --- User ---
 
   async getUser(): Promise<UserInfo> {
@@ -184,6 +194,12 @@ export class YandexWebmasterClient {
     );
   }
 
+  // --- Owners ---
+
+  async listOwners(hostId: string): Promise<OwnerList> {
+    return this.get<OwnerList>(`/hosts/${hostId}/owners`);
+  }
+
   // --- Sitemaps ---
 
   async listSitemaps(hostId: string): Promise<SitemapList> {
@@ -202,15 +218,24 @@ export class YandexWebmasterClient {
     return this.del(`/hosts/${hostId}/user-added-sitemaps/${sitemapId}`);
   }
 
-  // --- Indexing ---
-
-  async getIndexingStatus(hostId: string): Promise<IndexingStatus> {
-    return this.get<IndexingStatus>(`/hosts/${hostId}/indexing/status`);
+  async listUserSitemaps(hostId: string): Promise<SitemapList> {
+    return this.get<SitemapList>(`/hosts/${hostId}/user-added-sitemaps`);
   }
+
+  async getUserSitemap(hostId: string, sitemapId: string): Promise<Sitemap> {
+    return this.get<Sitemap>(`/hosts/${hostId}/user-added-sitemaps/${sitemapId}`);
+  }
+
+  // --- Indexing ---
 
   async getIndexingHistory(hostId: string, params?: DateRange): Promise<IndexingStatus> {
     const qs = buildQueryString(undefined, params);
     return this.get<IndexingStatus>(`/hosts/${hostId}/indexing/history${qs}`);
+  }
+
+  async getIndexingSamples(hostId: string, params?: Pagination): Promise<SearchUrlList> {
+    const qs = buildQueryString(params);
+    return this.get<SearchUrlList>(`/hosts/${hostId}/indexing/samples${qs}`);
   }
 
   // --- Search URLs ---
@@ -220,11 +245,31 @@ export class YandexWebmasterClient {
     return this.get<SearchUrlList>(`/hosts/${hostId}/search-urls/in-search/samples${qs}`);
   }
 
+  async getSearchUrlsHistory(hostId: string, params?: DateRange): Promise<unknown> {
+    const qs = buildQueryString(undefined, params);
+    return this.get<unknown>(`/hosts/${hostId}/search-urls/in-search/history${qs}`);
+  }
+
+  async getSearchEventsSamples(hostId: string, params?: Pagination): Promise<SearchEventList> {
+    const qs = buildQueryString(params);
+    return this.get<SearchEventList>(`/hosts/${hostId}/search-urls/events/samples${qs}`);
+  }
+
+  async getSearchEventsHistory(hostId: string, params?: DateRange): Promise<unknown> {
+    const qs = buildQueryString(undefined, params);
+    return this.get<unknown>(`/hosts/${hostId}/search-urls/events/history${qs}`);
+  }
+
   // --- Important URLs ---
 
   async getImportantUrls(hostId: string, params?: Pagination): Promise<ImportantUrlList> {
     const qs = buildQueryString(params);
     return this.get<ImportantUrlList>(`/hosts/${hostId}/important-urls${qs}`);
+  }
+
+  async getImportantUrlsHistory(hostId: string, params?: DateRange): Promise<unknown> {
+    const qs = buildQueryString(undefined, params);
+    return this.get<unknown>(`/hosts/${hostId}/important-urls/history${qs}`);
   }
 
   // --- Search Queries ---
@@ -237,6 +282,15 @@ export class YandexWebmasterClient {
   async getPopularQueries(hostId: string, params: SearchQueryParams): Promise<SearchQueryResult> {
     const qs = this.buildSearchQueryParams(params);
     return this.get<SearchQueryResult>(`/hosts/${hostId}/search-queries/popular${qs}`);
+  }
+
+  async getQueryHistory(hostId: string, queryId: string, params: SearchQueryParams): Promise<unknown> {
+    const qs = this.buildSearchQueryParams(params);
+    return this.get<unknown>(`/hosts/${hostId}/search-queries/${queryId}/history${qs}`);
+  }
+
+  async queryAnalytics(hostId: string, body: QueryAnalyticsRequest): Promise<QueryAnalyticsResult> {
+    return this.post<QueryAnalyticsResult>(`/hosts/${hostId}/query-analytics/list`, body);
   }
 
   private buildSearchQueryParams(params: SearchQueryParams): string {
@@ -256,26 +310,35 @@ export class YandexWebmasterClient {
     return `?${sp.toString()}`;
   }
 
-  // --- Backlinks ---
-
-  async getBacklinks(hostId: string): Promise<BacklinksInfo> {
-    return this.get<BacklinksInfo>(`/hosts/${hostId}/links/external/samples`);
-  }
+  // --- External Links ---
 
   async getExternalLinks(hostId: string, params?: Pagination): Promise<ExternalLinkList> {
     const qs = buildQueryString(params);
     return this.get<ExternalLinkList>(`/hosts/${hostId}/links/external/samples${qs}`);
   }
 
-  // --- SQI ---
-
-  async getSQI(hostId: string): Promise<SQIInfo> {
-    return this.get<SQIInfo>(`/hosts/${hostId}/sqi`);
+  async getExternalLinksHistory(hostId: string, params?: DateRange): Promise<unknown> {
+    const qs = buildQueryString(undefined, params);
+    return this.get<unknown>(`/hosts/${hostId}/links/external/history${qs}`);
   }
+
+  // --- Broken Internal Links ---
+
+  async getBrokenInternalLinks(hostId: string, params?: Pagination): Promise<BrokenLinkList> {
+    const qs = buildQueryString(params);
+    return this.get<BrokenLinkList>(`/hosts/${hostId}/links/internal/broken/samples${qs}`);
+  }
+
+  async getBrokenLinksHistory(hostId: string, params?: DateRange): Promise<unknown> {
+    const qs = buildQueryString(undefined, params);
+    return this.get<unknown>(`/hosts/${hostId}/links/internal/broken/history${qs}`);
+  }
+
+  // --- SQI ---
 
   async getSQIHistory(hostId: string, params?: DateRange): Promise<SQIHistory> {
     const qs = buildQueryString(undefined, params);
-    return this.get<SQIHistory>(`/hosts/${hostId}/sqi/history${qs}`);
+    return this.get<SQIHistory>(`/hosts/${hostId}/sqi-history${qs}`);
   }
 
   // --- Diagnostics ---
@@ -296,6 +359,32 @@ export class YandexWebmasterClient {
 
   async addRecrawlTask(hostId: string, url: string): Promise<RecrawlTask> {
     return this.post<RecrawlTask>(`/hosts/${hostId}/recrawl/tasks`, { url });
+  }
+
+  async getRecrawlTask(hostId: string, taskId: string): Promise<RecrawlTask> {
+    return this.get<RecrawlTask>(`/hosts/${hostId}/recrawl/queue/${taskId}`);
+  }
+
+  // --- Feeds ---
+
+  async listFeeds(hostId: string): Promise<FeedList> {
+    return this.get<FeedList>(`/hosts/${hostId}/feeds/list`);
+  }
+
+  async startFeedUpload(hostId: string, body: { url: string }): Promise<FeedUploadStatus> {
+    return this.post<FeedUploadStatus>(`/hosts/${hostId}/feeds/add/start`, body);
+  }
+
+  async getFeedUploadStatus(hostId: string): Promise<FeedUploadStatus> {
+    return this.get<FeedUploadStatus>(`/hosts/${hostId}/feeds/add/info`);
+  }
+
+  async batchAddFeeds(hostId: string, body: { urls: string[] }): Promise<unknown> {
+    return this.post<unknown>(`/hosts/${hostId}/feeds/batch/add`, body);
+  }
+
+  async batchRemoveFeeds(hostId: string, body: { urls: string[] }): Promise<unknown> {
+    return this.delWithBody<unknown>(`/hosts/${hostId}/feeds/batch/remove`, body);
   }
 
   // --- Original Texts ---

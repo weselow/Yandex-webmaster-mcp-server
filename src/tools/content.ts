@@ -82,22 +82,6 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
   // --- Indexing ---
 
   server.tool(
-    'ywm_get_indexing_status',
-    'Get current indexing status for a host',
-    { host_id: optionalHostIdSchema },
-    async (params) => {
-      try {
-        const hostId = client.resolveHostId(params.host_id);
-        const result = await client.getIndexingStatus(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
-      }
-    },
-  );
-
-  server.tool(
     'ywm_get_indexing_history',
     'Get indexing history over time for a host',
     {
@@ -162,6 +146,214 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           offset: params.offset,
           limit: params.limit,
         });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  // --- Search Events ---
+
+  server.tool(
+    'ywm_get_search_events_samples',
+    'Get pages excluded from search with reasons (LOW_QUALITY, DUPLICATE, etc.)',
+    {
+      host_id: optionalHostIdSchema,
+      offset: z.number().optional().describe('Number of results to skip'),
+      limit: z.number().optional().describe('Maximum number of results to return'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getSearchEventsSamples(hostId, {
+          offset: params.offset,
+          limit: params.limit,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  server.tool(
+    'ywm_get_search_events_history',
+    'Get search events history over time',
+    {
+      host_id: optionalHostIdSchema,
+      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
+      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getSearchEventsHistory(hostId, {
+          date_from: params.date_from,
+          date_to: params.date_to,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  // --- Search URLs History ---
+
+  server.tool(
+    'ywm_get_search_urls_history',
+    'Get search URLs in-search history over time',
+    {
+      host_id: optionalHostIdSchema,
+      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
+      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getSearchUrlsHistory(hostId, {
+          date_from: params.date_from,
+          date_to: params.date_to,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  // --- Indexing Samples ---
+
+  server.tool(
+    'ywm_get_indexing_samples',
+    'Get indexing samples with HTTP codes for a host',
+    {
+      host_id: optionalHostIdSchema,
+      offset: z.number().optional().describe('Number of results to skip'),
+      limit: z.number().optional().describe('Maximum number of results to return'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getIndexingSamples(hostId, {
+          offset: params.offset,
+          limit: params.limit,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  // --- Important URLs History ---
+
+  server.tool(
+    'ywm_get_important_urls_history',
+    'Get important URLs history over time',
+    {
+      host_id: optionalHostIdSchema,
+      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
+      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getImportantUrlsHistory(hostId, {
+          date_from: params.date_from,
+          date_to: params.date_to,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  // --- Broken Internal Links ---
+
+  server.tool(
+    'ywm_get_broken_internal_links',
+    'Get broken internal link samples for a host',
+    {
+      host_id: optionalHostIdSchema,
+      offset: z.number().optional().describe('Number of results to skip'),
+      limit: z.number().optional().describe('Maximum number of results to return'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getBrokenInternalLinks(hostId, {
+          offset: params.offset,
+          limit: params.limit,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  server.tool(
+    'ywm_get_broken_links_history',
+    'Get broken internal links history over time',
+    {
+      host_id: optionalHostIdSchema,
+      date_from: z.string().optional().describe('Start date in YYYY-MM-DD format'),
+      date_to: z.string().optional().describe('End date in YYYY-MM-DD format'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getBrokenLinksHistory(hostId, {
+          date_from: params.date_from,
+          date_to: params.date_to,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  // --- User-added Sitemaps ---
+
+  server.tool(
+    'ywm_list_user_sitemaps',
+    'List user-added sitemaps for a host',
+    { host_id: optionalHostIdSchema },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.listUserSitemaps(hostId);
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+      }
+    },
+  );
+
+  server.tool(
+    'ywm_get_user_sitemap',
+    'Get details of a specific user-added sitemap',
+    {
+      host_id: optionalHostIdSchema,
+      sitemap_id: z.string().describe('Sitemap ID'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getUserSitemap(hostId, params.sitemap_id);
         return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);

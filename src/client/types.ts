@@ -121,12 +121,6 @@ export interface SearchQueryResult {
 
 // --- Backlinks ---
 
-export interface BacklinksInfo {
-  links_total_count?: number;
-  hosts_total_count?: number;
-  last_checked_date?: string;
-}
-
 export interface ExternalLink {
   source_url: string;
   destination_url: string;
@@ -140,10 +134,6 @@ export interface ExternalLinkList {
 }
 
 // --- SQI ---
-
-export interface SQIInfo {
-  sqi: number;
-}
 
 export interface SQIHistoryEntry {
   date: string;
@@ -204,12 +194,92 @@ export interface OriginalTextQuota {
   quota_remainder: number;
 }
 
+// --- Owners ---
+
+export interface Owner {
+  user_id?: number;
+  user_name?: string;
+  verification_type?: string;
+  verified_date?: string;
+}
+
+export interface OwnerList {
+  owners: Owner[];
+}
+
 // --- Verification ---
 
 export interface VerificationInfo {
   verification_type?: string;
   verified?: boolean;
   verification_state?: string;
+}
+
+// --- Search Events ---
+
+export interface SearchEventInfo {
+  url: string;
+  last_access?: string;
+  excluded_url_status?: string;
+}
+
+export interface SearchEventList {
+  count?: number;
+  samples: SearchEventInfo[];
+}
+
+// --- Broken Links ---
+
+export interface BrokenLink {
+  source_url: string;
+  destination_url: string;
+  discovery_date?: string;
+  http_code?: number;
+}
+
+export interface BrokenLinkList {
+  count?: number;
+  links: BrokenLink[];
+}
+
+// --- Feeds ---
+
+export interface Feed {
+  feed_id?: string;
+  url?: string;
+  status?: string;
+  uploaded_date?: string;
+  errors_count?: number;
+}
+
+export interface FeedList {
+  feeds: Feed[];
+}
+
+export interface FeedUploadStatus {
+  feed_id?: string;
+  url?: string;
+  status?: string;
+  uploaded_date?: string;
+}
+
+// --- Query Analytics ---
+
+export interface QueryAnalyticsRequest {
+  device_type_indicator?: string;
+  text_indicator?: string;
+  region_ids?: number[];
+  filters?: Record<string, unknown>;
+  sort_by_date?: string;
+  date_from: string;
+  date_to: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface QueryAnalyticsResult {
+  text_indicator_queries?: unknown[];
+  count?: number;
 }
 
 // --- Request parameter types ---

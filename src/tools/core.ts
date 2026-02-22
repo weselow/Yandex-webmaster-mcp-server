@@ -154,7 +154,7 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
     async (params) => {
       try {
         const hostId = client.resolveHostId(params.host_id);
-        const result = await client.getVerificationStatus(hostId);
+        const result = await client.listOwners(hostId);
         return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
