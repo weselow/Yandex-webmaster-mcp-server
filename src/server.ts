@@ -1,6 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { YandexWebmasterClient } from './client/index.js';
 import { registerCoreTools } from './tools/core.js';
+import { registerContentTools } from './tools/content.js';
+import { registerAnalyticsTools } from './tools/analytics.js';
+import { registerActionTools } from './tools/actions.js';
 
 export function createServer(token: string): McpServer {
   const server = new McpServer({
@@ -18,10 +21,9 @@ export function createServer(token: string): McpServer {
   }
 
   registerCoreTools(server, client);
-
-  // TODO: registerContentTools(server, client)
-  // TODO: registerAnalyticsTools(server, client)
-  // TODO: registerActionTools(server, client)
+  registerContentTools(server, client);
+  registerAnalyticsTools(server, client);
+  registerActionTools(server, client);
 
   return server;
 }
