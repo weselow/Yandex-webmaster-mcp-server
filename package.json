@@ -2,7 +2,7 @@
   "name": "yandex-webmaster-mcp-server",
   "version": "1.0.0",
   "type": "module",
-  "description": "MCP-сервер для Yandex Webmaster API v4 — 31 инструмент для управления сайтами через Model Context Protocol",
+  "description": "MCP-сервер для Yandex Webmaster API v4 — 46 инструментов для управления сайтами через Model Context Protocol",
   "keywords": ["mcp", "yandex", "webmaster", "seo", "api", "mcp-server", "model-context-protocol"],
   "main": "dist/index.js",
   "bin": {

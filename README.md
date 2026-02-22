@@ -1,31 +1,39 @@
 # Yandex Webmaster MCP Server
 
-MCP server for the [Yandex Webmaster API v4](https://yandex.ru/dev/webmaster/doc/dg/reference/host-id.html). Provides 31 tools for managing sites, sitemaps, indexing, search analytics, backlinks, and more through the Model Context Protocol.
+MCP-сервер для [Yandex Webmaster API v4](https://yandex.ru/dev/webmaster/doc/dg/reference/host-id.html). Предоставляет **46 инструментов** для управления сайтами, картами сайтов, индексацией, поисковой аналитикой, обратными ссылками, фидами и многим другим через Model Context Protocol.
 
-## Features
+## Возможности
 
-- **Core** --- user info, host management, verification, diagnostics
-- **Content** --- sitemaps, indexing status/history, search URLs, important URLs
-- **Analytics** --- search query stats, popular queries, backlinks, external links, SQI
-- **Actions** --- recrawl submission, original text management
+- **Core** --- информация о пользователе, управление хостами, верификация, диагностика
+- **Content** --- карты сайтов, индексация, URL в поиске, важные URL, битые ссылки, события поиска
+- **Analytics** --- поисковые запросы, популярные запросы, внешние ссылки, SQI, аналитика запросов
+- **Actions** --- переобход страниц, оригинальные тексты, управление фидами
 
-## Installation
+## Установка
+
+### Через npx (рекомендуется)
 
 ```bash
-git clone https://github.com/your-org/yandex-webmaster-mcp-server.git
+npx yandex-webmaster-mcp-server
+```
+
+### Из исходников
+
+```bash
+git clone https://github.com/weselow/yandex-webmaster-mcp-server.git
 cd yandex-webmaster-mcp-server
 pnpm install
 pnpm build
 ```
 
-## Configuration
+## Настройка
 
-### Environment Variables
+### Переменные окружения
 
-| Variable | Required | Description |
+| Переменная | Обязательна | Описание |
 |---|---|---|
-| `YANDEX_WEBMASTER_OAUTH_TOKEN` | Yes | OAuth token for Yandex Webmaster API |
-| `YANDEX_WEBMASTER_HOST_URL` | No | Default host URL (e.g. `https://example.com`) to reduce API calls |
+| `YANDEX_WEBMASTER_OAUTH_TOKEN` | Да | OAuth-токен для Yandex Webmaster API |
+| `YANDEX_WEBMASTER_HOST_URL` | Нет | URL хоста по умолчанию (например `https://example.com`) для сокращения вызовов API |
 
 ### Получение OAuth-токена
 
@@ -33,8 +41,8 @@ pnpm build
 2. Создайте приложение:
    - Укажите название (любое, например «Webmaster MCP»)
    - В разделе «Доступ к данным» добавьте права:
-     - `webmaster:verify` — верификация сайтов
-     - `webmaster:hostinfo` — доступ к информации о сайтах
+     - `webmaster:verify` --- верификация сайтов
+     - `webmaster:hostinfo` --- доступ к информации о сайтах
    - Нажмите «Создать приложение»
    - Скопируйте **ClientID** из созданного приложения
 3. Откройте в браузере ссылку для получения токена (подставьте свой ClientID):
@@ -42,26 +50,42 @@ pnpm build
    https://oauth.yandex.ru/authorize?response_type=token&client_id=ВАШ_CLIENT_ID
    ```
 4. Авторизуйтесь и разрешите доступ приложению
-5. Яндекс перенаправит на страницу с токеном — скопируйте значение **access_token** из адресной строки
+5. Яндекс перенаправит на страницу с токеном --- скопируйте значение **access_token** из адресной строки
 6. Установите токен в переменную окружения `YANDEX_WEBMASTER_OAUTH_TOKEN`
 
-## Usage
+## Использование
 
-### stdio mode (default)
+### Режим stdio (по умолчанию)
 
 ```bash
 YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js
 ```
 
-### HTTP mode
+### HTTP-режим
 
 ```bash
 YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js --http --port=3000
 ```
 
-### MCP Client Configuration
+### Настройка MCP-клиента
 
-For Claude Desktop or `.mcp.json`:
+Для Claude Desktop или `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "yandex-webmaster": {
+      "command": "npx",
+      "args": ["-y", "yandex-webmaster-mcp-server"],
+      "env": {
+        "YANDEX_WEBMASTER_OAUTH_TOKEN": "your-token"
+      }
+    }
+  }
+}
+```
+
+Или, если установлено из исходников:
 
 ```json
 {
@@ -77,69 +101,92 @@ For Claude Desktop or `.mcp.json`:
 }
 ```
 
-## Available Tools
+## Доступные инструменты
 
-### Core
+### Core --- базовые операции (10)
 
-| Tool | Description | Type |
+Управление аккаунтом, хостами (сайтами), верификация и диагностика.
+
+| Инструмент | Описание | Тип |
 |---|---|---|
-| `ywm_get_user` | Get current user info | Read |
-| `ywm_list_hosts` | List all registered hosts | Read |
-| `ywm_get_host` | Get host details | Read |
-| `ywm_add_host` | Add a new host | Mutating |
-| `ywm_delete_host` | Delete a host | Mutating |
-| `ywm_get_host_summary` | Get host summary (SQI, page counts, problems) | Read |
-| `ywm_get_verification` | Get verification status | Read |
-| `ywm_verify_host` | Start host verification | Mutating |
-| `ywm_get_diagnostics` | Get site diagnostics | Read |
-| `ywm_list_owners` | List host owners | Read |
+| `ywm_get_user` | Получить информацию о текущем пользователе | Чтение |
+| `ywm_list_hosts` | Список всех зарегистрированных хостов | Чтение |
+| `ywm_get_host` | Получить детали хоста по ID | Чтение |
+| `ywm_add_host` | Добавить новый хост | Запись |
+| `ywm_delete_host` | Удалить хост | Запись |
+| `ywm_get_host_summary` | Сводная статистика хоста (SQI, страницы, проблемы) | Чтение |
+| `ywm_get_verification` | Статус верификации хоста | Чтение |
+| `ywm_verify_host` | Запустить верификацию хоста | Запись |
+| `ywm_get_diagnostics` | Диагностика сайта и обнаруженные проблемы | Чтение |
+| `ywm_list_owners` | Список владельцев хоста | Чтение |
 
-### Content
+### Content --- контент и индексация (16)
 
-| Tool | Description | Type |
+Карты сайтов, статус индексации, URL в поиске, важные URL, битые ссылки и события поиска.
+
+| Инструмент | Описание | Тип |
 |---|---|---|
-| `ywm_list_sitemaps` | List all sitemaps | Read |
-| `ywm_get_sitemap` | Get sitemap details | Read |
-| `ywm_add_sitemap` | Add a new sitemap | Mutating |
-| `ywm_delete_sitemap` | Delete a sitemap | Mutating |
-| `ywm_get_indexing_status` | Get current indexing status | Read |
-| `ywm_get_indexing_history` | Get indexing history over time | Read |
-| `ywm_get_search_urls` | Get URLs found in search | Read |
-| `ywm_get_important_urls` | Get important URLs with issues | Read |
+| `ywm_list_sitemaps` | Список всех карт сайтов | Чтение |
+| `ywm_get_sitemap` | Детали конкретной карты сайта | Чтение |
+| `ywm_add_sitemap` | Добавить карту сайта | Запись |
+| `ywm_delete_sitemap` | Удалить карту сайта | Запись |
+| `ywm_list_user_sitemaps` | Список пользовательских карт сайтов | Чтение |
+| `ywm_get_user_sitemap` | Детали пользовательской карты сайта | Чтение |
+| `ywm_get_indexing_history` | История индексации за период | Чтение |
+| `ywm_get_indexing_samples` | Примеры индексации с HTTP-кодами | Чтение |
+| `ywm_get_search_urls` | URL, найденные в поиске | Чтение |
+| `ywm_get_search_urls_history` | История URL в поиске за период | Чтение |
+| `ywm_get_important_urls` | Важные URL с проблемами | Чтение |
+| `ywm_get_important_urls_history` | История важных URL за период | Чтение |
+| `ywm_get_broken_internal_links` | Примеры битых внутренних ссылок | Чтение |
+| `ywm_get_broken_links_history` | История битых ссылок за период | Чтение |
+| `ywm_get_search_events_samples` | Страницы, исключённые из поиска (LOW_QUALITY, DUPLICATE и др.) | Чтение |
+| `ywm_get_search_events_history` | История событий поиска за период | Чтение |
 
-### Analytics
+### Analytics --- аналитика (7)
 
-| Tool | Description | Type |
+Поисковые запросы, внешние ссылки, SQI и продвинутая аналитика запросов.
+
+| Инструмент | Описание | Тип |
 |---|---|---|
-| `ywm_get_search_queries` | Get search query analytics history | Read |
-| `ywm_get_popular_queries` | Get popular search queries | Read |
-| `ywm_get_backlinks` | Get backlinks summary | Read |
-| `ywm_get_external_links` | Get external link samples | Read |
-| `ywm_get_sqi` | Get current SQI (Site Quality Index) | Read |
-| `ywm_get_sqi_history` | Get SQI history over time | Read |
+| `ywm_get_search_queries` | История поисковых запросов | Чтение |
+| `ywm_get_popular_queries` | Популярные поисковые запросы | Чтение |
+| `ywm_get_query_history` | История конкретного поискового запроса | Чтение |
+| `ywm_query_analytics` | Расширенная аналитика запросов с фильтрами | Чтение |
+| `ywm_get_external_links` | Примеры внешних ссылок | Чтение |
+| `ywm_get_external_links_history` | История внешних ссылок за период | Чтение |
+| `ywm_get_sqi_history` | История SQI (индекс качества сайта) за период | Чтение |
 
-### Actions
+### Actions --- действия (13)
 
-| Tool | Description | Type |
+Переобход страниц, оригинальные тексты и управление фидами.
+
+| Инструмент | Описание | Тип |
 |---|---|---|
-| `ywm_get_recrawl_quota` | Get recrawl quota | Read |
-| `ywm_list_recrawl_tasks` | List recrawl tasks | Read |
-| `ywm_submit_recrawl` | Submit URL for recrawling | Mutating |
-| `ywm_get_original_texts` | List original texts | Read |
-| `ywm_add_original_text` | Add an original text | Mutating |
-| `ywm_delete_original_text` | Delete an original text | Mutating |
-| `ywm_get_original_text_quota` | Get original text quota | Read |
+| `ywm_get_recrawl_quota` | Квота на переобход | Чтение |
+| `ywm_list_recrawl_tasks` | Список задач на переобход | Чтение |
+| `ywm_get_recrawl_task` | Детали конкретной задачи на переобход | Чтение |
+| `ywm_submit_recrawl` | Отправить URL на переобход (расходует квоту) | Запись |
+| `ywm_get_original_texts` | Список оригинальных текстов | Чтение |
+| `ywm_add_original_text` | Добавить оригинальный текст | Запись |
+| `ywm_delete_original_text` | Удалить оригинальный текст | Запись |
+| `ywm_get_original_text_quota` | Квота на оригинальные тексты | Чтение |
+| `ywm_list_feeds` | Список всех фидов | Чтение |
+| `ywm_start_feed_upload` | Запустить загрузку фида | Запись |
+| `ywm_get_feed_upload_status` | Статус загрузки фида | Чтение |
+| `ywm_batch_add_feeds` | Массовое добавление фидов | Запись |
+| `ywm_batch_remove_feeds` | Массовое удаление фидов | Запись |
 
-## Development
+## Разработка
 
 ```bash
-pnpm install          # Install dependencies
-pnpm dev              # Run in development mode (watch)
-pnpm build            # Build for production
-pnpm test             # Run tests
-pnpm test:watch       # Run tests in watch mode
+pnpm install          # Установка зависимостей
+pnpm dev              # Запуск в режиме разработки (watch)
+pnpm build            # Сборка для продакшена
+pnpm test             # Запуск тестов
+pnpm test:watch       # Запуск тестов в режиме наблюдения
 ```
 
-## License
+## Лицензия
 
 MIT
