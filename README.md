@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="resources/yandex-webmaster-mcp-server.jpg" alt="Yandex Webmaster MCP Server" />
+</p>
+
 # Yandex Webmaster MCP Server
 
 [![npm version](https://img.shields.io/npm/v/yandex-webmaster-mcp-server)](https://www.npmjs.com/package/yandex-webmaster-mcp-server)
