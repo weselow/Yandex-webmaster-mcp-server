@@ -16,6 +16,9 @@ function createMockClient() {
     addRecrawlTask: vi.fn().mockResolvedValue({
       task_id: 't2', url: 'https://example.com/new', added_date: '2024-01-02',
     }),
+    getRecrawlTask: vi.fn().mockResolvedValue({
+      task_id: 't1', url: 'https://example.com/page', added_date: '2024-01-01', status: 'IN_PROGRESS',
+    }),
     getOriginalTexts: vi.fn().mockResolvedValue({
       count: 1,
       texts: [{ text_id: 'txt1', content: 'Hello world', added_date: '2024-01-01' }],
@@ -25,6 +28,17 @@ function createMockClient() {
     }),
     deleteOriginalText: vi.fn().mockResolvedValue(undefined),
     getOriginalTextQuota: vi.fn().mockResolvedValue({ daily_quota: 50, quota_remainder: 30 }),
+    listFeeds: vi.fn().mockResolvedValue({
+      feeds: [{ feed_id: 'f1', url: 'https://example.com/feed.xml', status: 'OK' }],
+    }),
+    startFeedUpload: vi.fn().mockResolvedValue({
+      feed_id: 'f2', url: 'https://example.com/new-feed.xml', status: 'UPLOADING',
+    }),
+    getFeedUploadStatus: vi.fn().mockResolvedValue({
+      feed_id: 'f2', status: 'COMPLETED',
+    }),
+    batchAddFeeds: vi.fn().mockResolvedValue({ added: 2 }),
+    batchRemoveFeeds: vi.fn().mockResolvedValue({ removed: 1 }),
   };
 }
 
@@ -253,6 +267,156 @@ describe('Action tools', () => {
 
       expect(result.isError).toBe(true);
       expect(getTextContent(result)).toContain('Quota failed');
+    });
+  });
+
+  // --- Recrawl task details ---
+
+  describe('ywm_get_recrawl_task', () => {
+    it('returns recrawl task details', async () => {
+      const result = await callTool(client, 'ywm_get_recrawl_task', {
+        host_id: 'h1',
+        task_id: 't1',
+      });
+      const parsed = JSON.parse(getTextContent(result));
+
+      expect(parsed.task_id).toBe('t1');
+      expect(parsed.status).toBe('IN_PROGRESS');
+      expect(mockClient.getRecrawlTask).toHaveBeenCalledWith('h1', 't1');
+    });
+
+    it('returns error when client throws', async () => {
+      mockClient.getRecrawlTask.mockRejectedValueOnce(new Error('Task not found'));
+
+      const result = await callTool(client, 'ywm_get_recrawl_task', {
+        host_id: 'h1',
+        task_id: 'bad',
+      });
+
+      expect(result.isError).toBe(true);
+      expect(getTextContent(result)).toContain('Task not found');
+    });
+  });
+
+  // --- Feed tools ---
+
+  describe('ywm_list_feeds', () => {
+    it('returns feeds list', async () => {
+      const result = await callTool(client, 'ywm_list_feeds', { host_id: 'h1' });
+      const parsed = JSON.parse(getTextContent(result));
+
+      expect(parsed.feeds).toHaveLength(1);
+      expect(parsed.feeds[0].feed_id).toBe('f1');
+      expect(mockClient.listFeeds).toHaveBeenCalledWith('h1');
+    });
+
+    it('returns error when client throws', async () => {
+      mockClient.listFeeds.mockRejectedValueOnce(new Error('Feeds failed'));
+
+      const result = await callTool(client, 'ywm_list_feeds', { host_id: 'h1' });
+
+      expect(result.isError).toBe(true);
+      expect(getTextContent(result)).toContain('Feeds failed');
+    });
+  });
+
+  describe('ywm_start_feed_upload', () => {
+    it('starts feed upload and returns result', async () => {
+      const result = await callTool(client, 'ywm_start_feed_upload', {
+        host_id: 'h1',
+        url: 'https://example.com/new-feed.xml',
+      });
+      const parsed = JSON.parse(getTextContent(result));
+
+      expect(parsed.feed_id).toBe('f2');
+      expect(parsed.status).toBe('UPLOADING');
+      expect(mockClient.startFeedUpload).toHaveBeenCalledWith('h1', { url: 'https://example.com/new-feed.xml' });
+    });
+
+    it('returns error when client throws', async () => {
+      mockClient.startFeedUpload.mockRejectedValueOnce(new Error('Upload failed'));
+
+      const result = await callTool(client, 'ywm_start_feed_upload', {
+        host_id: 'h1',
+        url: 'https://example.com/bad.xml',
+      });
+
+      expect(result.isError).toBe(true);
+      expect(getTextContent(result)).toContain('Upload failed');
+    });
+  });
+
+  describe('ywm_get_feed_upload_status', () => {
+    it('returns feed upload status', async () => {
+      const result = await callTool(client, 'ywm_get_feed_upload_status', { host_id: 'h1' });
+      const parsed = JSON.parse(getTextContent(result));
+
+      expect(parsed.feed_id).toBe('f2');
+      expect(parsed.status).toBe('COMPLETED');
+      expect(mockClient.getFeedUploadStatus).toHaveBeenCalledWith('h1');
+    });
+
+    it('returns error when client throws', async () => {
+      mockClient.getFeedUploadStatus.mockRejectedValueOnce(new Error('Status failed'));
+
+      const result = await callTool(client, 'ywm_get_feed_upload_status', { host_id: 'h1' });
+
+      expect(result.isError).toBe(true);
+      expect(getTextContent(result)).toContain('Status failed');
+    });
+  });
+
+  describe('ywm_batch_add_feeds', () => {
+    it('batch adds feeds and returns result', async () => {
+      const result = await callTool(client, 'ywm_batch_add_feeds', {
+        host_id: 'h1',
+        urls: ['https://example.com/feed1.xml', 'https://example.com/feed2.xml'],
+      });
+      const parsed = JSON.parse(getTextContent(result));
+
+      expect(parsed.added).toBe(2);
+      expect(mockClient.batchAddFeeds).toHaveBeenCalledWith('h1', {
+        urls: ['https://example.com/feed1.xml', 'https://example.com/feed2.xml'],
+      });
+    });
+
+    it('returns error when client throws', async () => {
+      mockClient.batchAddFeeds.mockRejectedValueOnce(new Error('Batch add failed'));
+
+      const result = await callTool(client, 'ywm_batch_add_feeds', {
+        host_id: 'h1',
+        urls: ['https://example.com/bad.xml'],
+      });
+
+      expect(result.isError).toBe(true);
+      expect(getTextContent(result)).toContain('Batch add failed');
+    });
+  });
+
+  describe('ywm_batch_remove_feeds', () => {
+    it('batch removes feeds and returns result', async () => {
+      const result = await callTool(client, 'ywm_batch_remove_feeds', {
+        host_id: 'h1',
+        urls: ['https://example.com/feed1.xml'],
+      });
+      const parsed = JSON.parse(getTextContent(result));
+
+      expect(parsed.removed).toBe(1);
+      expect(mockClient.batchRemoveFeeds).toHaveBeenCalledWith('h1', {
+        urls: ['https://example.com/feed1.xml'],
+      });
+    });
+
+    it('returns error when client throws', async () => {
+      mockClient.batchRemoveFeeds.mockRejectedValueOnce(new Error('Batch remove failed'));
+
+      const result = await callTool(client, 'ywm_batch_remove_feeds', {
+        host_id: 'h1',
+        urls: ['https://example.com/bad.xml'],
+      });
+
+      expect(result.isError).toBe(true);
+      expect(getTextContent(result)).toContain('Batch remove failed');
     });
   });
 });

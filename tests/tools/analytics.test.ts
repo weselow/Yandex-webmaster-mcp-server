@@ -11,10 +11,11 @@ function createMockClient() {
     resolveHostId: vi.fn((hostId?: string) => hostId ?? 'default-host'),
     getSearchQueries: vi.fn().mockResolvedValue({ count: 1, queries: [{ query_text: 'test', indicators: {} }] }),
     getPopularQueries: vi.fn().mockResolvedValue({ count: 2, queries: [{ query_text: 'popular', indicators: {} }] }),
-    getBacklinks: vi.fn().mockResolvedValue({ links_total_count: 100, hosts_total_count: 10 }),
     getExternalLinks: vi.fn().mockResolvedValue({ count: 5, links: [{ source_url: 'https://a.com', destination_url: 'https://b.com' }] }),
-    getSQI: vi.fn().mockResolvedValue({ sqi: 42 }),
+    getExternalLinksHistory: vi.fn().mockResolvedValue({ history: [{ date: '2024-01-01', count: 50 }] }),
     getSQIHistory: vi.fn().mockResolvedValue({ history: [{ date: '2024-01-01', sqi: 40 }] }),
+    getQueryHistory: vi.fn().mockResolvedValue({ history: [{ date: '2024-01-01', value: 10 }] }),
+    queryAnalytics: vi.fn().mockResolvedValue({ text_indicator_queries: [], count: 0 }),
   } as unknown as YandexWebmasterClient;
 }
 
@@ -152,34 +153,6 @@ describe('Analytics MCP Tools', () => {
     });
   });
 
-  // --- ywm_get_backlinks ---
-
-  describe('ywm_get_backlinks', () => {
-    it('returns backlinks summary', async () => {
-      const result = await client.callTool({
-        name: 'ywm_get_backlinks',
-        arguments: { host_id: 'h1' },
-      });
-
-      expect(result.isError).toBeFalsy();
-      const text = (result.content as Array<{ type: string; text: string }>)[0].text;
-      const parsed = JSON.parse(text);
-      expect(parsed.links_total_count).toBe(100);
-      expect(parsed.hosts_total_count).toBe(10);
-    });
-
-    it('uses default host when host_id is not provided', async () => {
-      await client.callTool({
-        name: 'ywm_get_backlinks',
-        arguments: {},
-      });
-
-      const mock = mockWmClient.resolveHostId as ReturnType<typeof vi.fn>;
-      expect(mock).toHaveBeenCalledWith(undefined);
-      expect(mockWmClient.getBacklinks).toHaveBeenCalledWith('default-host');
-    });
-  });
-
   // --- ywm_get_external_links ---
 
   describe('ywm_get_external_links', () => {
@@ -206,22 +179,6 @@ describe('Analytics MCP Tools', () => {
         offset: 5,
         limit: 20,
       });
-    });
-  });
-
-  // --- ywm_get_sqi ---
-
-  describe('ywm_get_sqi', () => {
-    it('returns current SQI', async () => {
-      const result = await client.callTool({
-        name: 'ywm_get_sqi',
-        arguments: { host_id: 'h1' },
-      });
-
-      expect(result.isError).toBeFalsy();
-      const text = (result.content as Array<{ type: string; text: string }>)[0].text;
-      const parsed = JSON.parse(text);
-      expect(parsed.sqi).toBe(42);
     });
   });
 
@@ -255,6 +212,163 @@ describe('Analytics MCP Tools', () => {
         date_from: '2024-01-01',
         date_to: '2024-06-01',
       });
+    });
+  });
+
+  // --- ywm_get_external_links_history ---
+
+  describe('ywm_get_external_links_history', () => {
+    it('returns external links history', async () => {
+      const result = await client.callTool({
+        name: 'ywm_get_external_links_history',
+        arguments: { host_id: 'h1', date_from: '2024-01-01', date_to: '2024-06-01' },
+      });
+
+      expect(result.isError).toBeFalsy();
+      const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+      const parsed = JSON.parse(text);
+      expect(parsed.history[0].count).toBe(50);
+    });
+
+    it('passes date range params', async () => {
+      await client.callTool({
+        name: 'ywm_get_external_links_history',
+        arguments: { host_id: 'h1', date_from: '2024-01-01', date_to: '2024-06-01' },
+      });
+
+      expect(mockWmClient.getExternalLinksHistory).toHaveBeenCalledWith('h1', {
+        date_from: '2024-01-01',
+        date_to: '2024-06-01',
+      });
+    });
+  });
+
+  // --- ywm_get_query_history ---
+
+  describe('ywm_get_query_history', () => {
+    it('returns query history', async () => {
+      const result = await client.callTool({
+        name: 'ywm_get_query_history',
+        arguments: {
+          host_id: 'h1',
+          query_id: 'q1',
+          date_from: '2024-01-01',
+          date_to: '2024-02-01',
+          query_indicator: 'TOTAL_CLICKS',
+        },
+      });
+
+      expect(result.isError).toBeFalsy();
+      const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+      const parsed = JSON.parse(text);
+      expect(parsed.history[0].value).toBe(10);
+    });
+
+    it('passes all params to client', async () => {
+      await client.callTool({
+        name: 'ywm_get_query_history',
+        arguments: {
+          host_id: 'h1',
+          query_id: 'q1',
+          date_from: '2024-01-01',
+          date_to: '2024-02-01',
+          query_indicator: 'TOTAL_SHOWS',
+          device_type_indicator: 'DESKTOP',
+        },
+      });
+
+      expect(mockWmClient.getQueryHistory).toHaveBeenCalledWith('h1', 'q1', {
+        date_from: '2024-01-01',
+        date_to: '2024-02-01',
+        query_indicator: 'TOTAL_SHOWS',
+        device_type_indicator: 'DESKTOP',
+      });
+    });
+
+    it('returns error on failure', async () => {
+      const mock = mockWmClient.getQueryHistory as ReturnType<typeof vi.fn>;
+      mock.mockRejectedValueOnce(new Error('Query not found'));
+
+      const result = await client.callTool({
+        name: 'ywm_get_query_history',
+        arguments: {
+          host_id: 'h1',
+          query_id: 'bad',
+          date_from: '2024-01-01',
+          date_to: '2024-02-01',
+          query_indicator: 'TOTAL_CLICKS',
+        },
+      });
+
+      expect(result.isError).toBe(true);
+      const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+      expect(text).toContain('Query not found');
+    });
+  });
+
+  // --- ywm_query_analytics ---
+
+  describe('ywm_query_analytics', () => {
+    it('returns query analytics', async () => {
+      const result = await client.callTool({
+        name: 'ywm_query_analytics',
+        arguments: {
+          host_id: 'h1',
+          date_from: '2024-01-01',
+          date_to: '2024-02-01',
+        },
+      });
+
+      expect(result.isError).toBeFalsy();
+      const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+      const parsed = JSON.parse(text);
+      expect(parsed.count).toBe(0);
+    });
+
+    it('passes all params to client', async () => {
+      await client.callTool({
+        name: 'ywm_query_analytics',
+        arguments: {
+          host_id: 'h1',
+          date_from: '2024-01-01',
+          date_to: '2024-02-01',
+          device_type_indicator: 'MOBILE',
+          text_indicator: 'URL',
+          region_ids: [1, 2],
+          limit: 50,
+          offset: 10,
+        },
+      });
+
+      expect(mockWmClient.queryAnalytics).toHaveBeenCalledWith('h1', {
+        date_from: '2024-01-01',
+        date_to: '2024-02-01',
+        device_type_indicator: 'MOBILE',
+        text_indicator: 'URL',
+        region_ids: [1, 2],
+        filters: undefined,
+        sort_by_date: undefined,
+        limit: 50,
+        offset: 10,
+      });
+    });
+
+    it('returns error on failure', async () => {
+      const mock = mockWmClient.queryAnalytics as ReturnType<typeof vi.fn>;
+      mock.mockRejectedValueOnce(new Error('Analytics failed'));
+
+      const result = await client.callTool({
+        name: 'ywm_query_analytics',
+        arguments: {
+          host_id: 'h1',
+          date_from: '2024-01-01',
+          date_to: '2024-02-01',
+        },
+      });
+
+      expect(result.isError).toBe(true);
+      const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+      expect(text).toContain('Analytics failed');
     });
   });
 });

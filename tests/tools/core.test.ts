@@ -50,6 +50,9 @@ function createMockClient(overrides: Partial<YandexWebmasterClient> = {}): Yande
     getDiagnostics: vi.fn().mockResolvedValue({
       problems: [{ problem_id: 'PROBLEM_1', severity: 'WARNING' }],
     }),
+    listOwners: vi.fn().mockResolvedValue({
+      owners: [{ user_id: 1, user_name: 'admin', verification_type: 'DNS' }],
+    }),
     resolveHostId: vi.fn().mockImplementation((id?: string) => id ?? 'https:example.com:443'),
     resolveDefaultHost: vi.fn().mockResolvedValue('https:example.com:443'),
     ...overrides,
@@ -254,7 +257,7 @@ describe('Core MCP Tools', () => {
   });
 
   describe('ywm_list_owners', () => {
-    it('returns owner verification info', async () => {
+    it('returns owners list', async () => {
       const result = await mcpClient.callTool({
         name: 'ywm_list_owners',
         arguments: { host_id: 'https:example.com:443' },
@@ -263,8 +266,9 @@ describe('Core MCP Tools', () => {
       expect(result.isError).toBeFalsy();
       const text = (result.content as Array<{ type: string; text: string }>)[0].text;
       const parsed = JSON.parse(text);
-      expect(parsed.verified).toBe(true);
-      expect(mockApiClient.getVerificationStatus).toHaveBeenCalled();
+      expect(parsed.owners).toHaveLength(1);
+      expect(parsed.owners[0].user_name).toBe('admin');
+      expect(mockApiClient.listOwners).toHaveBeenCalled();
     });
   });
 

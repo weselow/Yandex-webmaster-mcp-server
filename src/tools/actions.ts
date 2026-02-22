@@ -141,4 +141,110 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       }
     },
   );
+
+  // --- Recrawl task details ---
+
+  server.tool(
+    'ywm_get_recrawl_task',
+    'Get details of a specific recrawl task',
+    {
+      host_id: optionalHostIdSchema,
+      task_id: z.string().describe('Recrawl task ID'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getRecrawlTask(hostId, params.task_id);
+        return jsonResponse(result);
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
+
+  // --- Feed tools ---
+
+  server.tool(
+    'ywm_list_feeds',
+    'List all feeds for a host',
+    { host_id: optionalHostIdSchema },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.listFeeds(hostId);
+        return jsonResponse(result);
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
+
+  server.tool(
+    'ywm_start_feed_upload',
+    'Start a feed upload (destructive action)',
+    {
+      host_id: optionalHostIdSchema,
+      url: z.string().describe('Feed URL to upload'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.startFeedUpload(hostId, { url: params.url });
+        return jsonResponse(result);
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
+
+  server.tool(
+    'ywm_get_feed_upload_status',
+    'Get feed upload status',
+    { host_id: optionalHostIdSchema },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.getFeedUploadStatus(hostId);
+        return jsonResponse(result);
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
+
+  server.tool(
+    'ywm_batch_add_feeds',
+    'Batch add multiple feeds (destructive action)',
+    {
+      host_id: optionalHostIdSchema,
+      urls: z.array(z.string()).describe('List of feed URLs to add'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.batchAddFeeds(hostId, { urls: params.urls });
+        return jsonResponse(result);
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
+
+  server.tool(
+    'ywm_batch_remove_feeds',
+    'Batch remove multiple feeds (destructive action)',
+    {
+      host_id: optionalHostIdSchema,
+      urls: z.array(z.string()).describe('List of feed URLs to remove'),
+    },
+    async (params) => {
+      try {
+        const hostId = client.resolveHostId(params.host_id);
+        const result = await client.batchRemoveFeeds(hostId, { urls: params.urls });
+        return jsonResponse(result);
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
 }

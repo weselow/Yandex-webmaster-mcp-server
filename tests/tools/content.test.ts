@@ -11,10 +11,18 @@ function createMockClient() {
     getSitemap: vi.fn(),
     addSitemap: vi.fn(),
     deleteSitemap: vi.fn(),
-    getIndexingStatus: vi.fn(),
     getIndexingHistory: vi.fn(),
+    getIndexingSamples: vi.fn(),
     getSearchUrls: vi.fn(),
+    getSearchUrlsHistory: vi.fn(),
+    getSearchEventsSamples: vi.fn(),
+    getSearchEventsHistory: vi.fn(),
     getImportantUrls: vi.fn(),
+    getImportantUrlsHistory: vi.fn(),
+    getBrokenInternalLinks: vi.fn(),
+    getBrokenLinksHistory: vi.fn(),
+    listUserSitemaps: vi.fn(),
+    getUserSitemap: vi.fn(),
   };
 }
 
@@ -171,31 +179,6 @@ describe('Content Tools', () => {
     });
   });
 
-  // --- ywm_get_indexing_status ---
-
-  describe('ywm_get_indexing_status', () => {
-    it('returns indexing status', async () => {
-      const mockData = { indexed_count: 100, excluded_count: 5 };
-      mockClient.getIndexingStatus.mockResolvedValue(mockData);
-
-      const { client } = await setupTestServer(mockClient);
-      const result = await client.callTool({ name: 'ywm_get_indexing_status', arguments: {} });
-
-      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
-      expect(mockClient.getIndexingStatus).toHaveBeenCalledWith('default-host');
-    });
-
-    it('returns error on failure', async () => {
-      mockClient.getIndexingStatus.mockRejectedValue(new Error('Timeout'));
-
-      const { client } = await setupTestServer(mockClient);
-      const result = await client.callTool({ name: 'ywm_get_indexing_status', arguments: {} });
-
-      expect(result.isError).toBe(true);
-      expect((result.content as any)[0].text).toContain('Timeout');
-    });
-  });
-
   // --- ywm_get_indexing_history ---
 
   describe('ywm_get_indexing_history', () => {
@@ -322,6 +305,263 @@ describe('Content Tools', () => {
 
       expect(result.isError).toBe(true);
       expect((result.content as any)[0].text).toContain('Rate limited');
+    });
+  });
+
+  // --- ywm_get_search_events_samples ---
+
+  describe('ywm_get_search_events_samples', () => {
+    it('returns search event samples', async () => {
+      const mockData = { count: 1, samples: [{ url: 'https://ex.com/excluded', excluded_url_status: 'DUPLICATE' }] };
+      mockClient.getSearchEventsSamples.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_search_events_samples',
+        arguments: { offset: 0, limit: 10 },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getSearchEventsSamples).toHaveBeenCalledWith('default-host', { offset: 0, limit: 10 });
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getSearchEventsSamples.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_get_search_events_samples', arguments: {} });
+
+      expect(result.isError).toBe(true);
+      expect((result.content as any)[0].text).toContain('Failed');
+    });
+  });
+
+  // --- ywm_get_search_events_history ---
+
+  describe('ywm_get_search_events_history', () => {
+    it('returns search events history', async () => {
+      const mockData = { history: [{ date: '2024-01-01', count: 5 }] };
+      mockClient.getSearchEventsHistory.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_search_events_history',
+        arguments: { date_from: '2024-01-01', date_to: '2024-02-01' },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getSearchEventsHistory).toHaveBeenCalledWith('default-host', {
+        date_from: '2024-01-01',
+        date_to: '2024-02-01',
+      });
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getSearchEventsHistory.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_get_search_events_history', arguments: {} });
+
+      expect(result.isError).toBe(true);
+    });
+  });
+
+  // --- ywm_get_search_urls_history ---
+
+  describe('ywm_get_search_urls_history', () => {
+    it('returns search URLs history', async () => {
+      const mockData = { history: [{ date: '2024-01-01', count: 100 }] };
+      mockClient.getSearchUrlsHistory.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_search_urls_history',
+        arguments: { date_from: '2024-01-01', date_to: '2024-02-01' },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getSearchUrlsHistory).toHaveBeenCalledWith('default-host', {
+        date_from: '2024-01-01',
+        date_to: '2024-02-01',
+      });
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getSearchUrlsHistory.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_get_search_urls_history', arguments: {} });
+
+      expect(result.isError).toBe(true);
+    });
+  });
+
+  // --- ywm_get_indexing_samples ---
+
+  describe('ywm_get_indexing_samples', () => {
+    it('returns indexing samples', async () => {
+      const mockData = { count: 1, samples: [{ url: 'https://ex.com/page', http_code: 200 }] };
+      mockClient.getIndexingSamples.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_indexing_samples',
+        arguments: { offset: 0, limit: 10 },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getIndexingSamples).toHaveBeenCalledWith('default-host', { offset: 0, limit: 10 });
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getIndexingSamples.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_get_indexing_samples', arguments: {} });
+
+      expect(result.isError).toBe(true);
+    });
+  });
+
+  // --- ywm_get_important_urls_history ---
+
+  describe('ywm_get_important_urls_history', () => {
+    it('returns important URLs history', async () => {
+      const mockData = { history: [{ date: '2024-01-01', count: 10 }] };
+      mockClient.getImportantUrlsHistory.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_important_urls_history',
+        arguments: { date_from: '2024-01-01', date_to: '2024-02-01' },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getImportantUrlsHistory).toHaveBeenCalledWith('default-host', {
+        date_from: '2024-01-01',
+        date_to: '2024-02-01',
+      });
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getImportantUrlsHistory.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_get_important_urls_history', arguments: {} });
+
+      expect(result.isError).toBe(true);
+    });
+  });
+
+  // --- ywm_get_broken_internal_links ---
+
+  describe('ywm_get_broken_internal_links', () => {
+    it('returns broken internal links', async () => {
+      const mockData = { count: 1, links: [{ source_url: 'https://ex.com/a', destination_url: 'https://ex.com/b' }] };
+      mockClient.getBrokenInternalLinks.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_broken_internal_links',
+        arguments: { offset: 0, limit: 10 },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getBrokenInternalLinks).toHaveBeenCalledWith('default-host', { offset: 0, limit: 10 });
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getBrokenInternalLinks.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_get_broken_internal_links', arguments: {} });
+
+      expect(result.isError).toBe(true);
+    });
+  });
+
+  // --- ywm_get_broken_links_history ---
+
+  describe('ywm_get_broken_links_history', () => {
+    it('returns broken links history', async () => {
+      const mockData = { history: [{ date: '2024-01-01', count: 3 }] };
+      mockClient.getBrokenLinksHistory.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_broken_links_history',
+        arguments: { date_from: '2024-01-01', date_to: '2024-02-01' },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getBrokenLinksHistory).toHaveBeenCalledWith('default-host', {
+        date_from: '2024-01-01',
+        date_to: '2024-02-01',
+      });
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getBrokenLinksHistory.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_get_broken_links_history', arguments: {} });
+
+      expect(result.isError).toBe(true);
+    });
+  });
+
+  // --- ywm_list_user_sitemaps ---
+
+  describe('ywm_list_user_sitemaps', () => {
+    it('returns user sitemaps list', async () => {
+      const mockData = { sitemaps: [{ sitemap_id: 'us1', sitemap_url: 'https://ex.com/user-sitemap.xml' }] };
+      mockClient.listUserSitemaps.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_list_user_sitemaps', arguments: {} });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.listUserSitemaps).toHaveBeenCalledWith('default-host');
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.listUserSitemaps.mockRejectedValue(new Error('Failed'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({ name: 'ywm_list_user_sitemaps', arguments: {} });
+
+      expect(result.isError).toBe(true);
+    });
+  });
+
+  // --- ywm_get_user_sitemap ---
+
+  describe('ywm_get_user_sitemap', () => {
+    it('returns user sitemap details', async () => {
+      const mockData = { sitemap_id: 'us1', sitemap_url: 'https://ex.com/user-sitemap.xml' };
+      mockClient.getUserSitemap.mockResolvedValue(mockData);
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_user_sitemap',
+        arguments: { sitemap_id: 'us1' },
+      });
+
+      expect(JSON.parse((result.content as any)[0].text)).toEqual(mockData);
+      expect(mockClient.getUserSitemap).toHaveBeenCalledWith('default-host', 'us1');
+    });
+
+    it('returns error on failure', async () => {
+      mockClient.getUserSitemap.mockRejectedValue(new Error('Not found'));
+
+      const { client } = await setupTestServer(mockClient);
+      const result = await client.callTool({
+        name: 'ywm_get_user_sitemap',
+        arguments: { sitemap_id: 'bad' },
+      });
+
+      expect(result.isError).toBe(true);
+      expect((result.content as any)[0].text).toContain('Not found');
     });
   });
 });
