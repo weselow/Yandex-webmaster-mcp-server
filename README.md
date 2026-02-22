@@ -1,160 +1,145 @@
 # Yandex Webmaster MCP Server
 
-MCP-сервер для [Yandex Webmaster API v4](https://yandex.ru/dev/webmaster/doc/dg/reference/host-id.html). Предоставляет 31 инструмент для управления сайтами, картами сайта, индексацией, поисковой аналитикой, обратными ссылками и другими функциями Яндекс.Вебмастера через Model Context Protocol.
+MCP server for the [Yandex Webmaster API v4](https://yandex.ru/dev/webmaster/doc/dg/reference/host-id.html). Provides 31 tools for managing sites, sitemaps, indexing, search analytics, backlinks, and more through the Model Context Protocol.
 
-## Возможности
+## Features
 
-- **Основные** — информация о пользователе, управление сайтами, верификация, диагностика
-- **Контент** — карты сайта, статус и история индексации, URL в поиске, важные URL
-- **Аналитика** — статистика поисковых запросов, популярные запросы, обратные ссылки, внешние ссылки, ИКС
-- **Действия** — отправка на переобход, управление оригинальными текстами
+- **Core** --- user info, host management, verification, diagnostics
+- **Content** --- sitemaps, indexing status/history, search URLs, important URLs
+- **Analytics** --- search query stats, popular queries, backlinks, external links, SQI
+- **Actions** --- recrawl submission, original text management
 
-## Быстрый старт
-
-### Использование через npx (рекомендуется)
-
-Не требует установки. Добавьте в конфигурацию MCP-клиента:
-
-```json
-{
-  "mcpServers": {
-    "yandex-webmaster": {
-      "command": "npx",
-      "args": ["-y", "yandex-webmaster-mcp-server"],
-      "env": {
-        "YANDEX_WEBMASTER_OAUTH_TOKEN": "ваш-токен"
-      }
-    }
-  }
-}
-```
-
-### Установка из исходников
+## Installation
 
 ```bash
-git clone https://github.com/weselow/yandex-webmaster-mcp-server.git
+git clone https://github.com/your-org/yandex-webmaster-mcp-server.git
 cd yandex-webmaster-mcp-server
 pnpm install
 pnpm build
 ```
 
-## Настройка
+## Configuration
 
-### Переменные окружения
+### Environment Variables
 
-| Переменная | Обязательная | Описание |
+| Variable | Required | Description |
 |---|---|---|
-| `YANDEX_WEBMASTER_OAUTH_TOKEN` | Да | OAuth-токен для Yandex Webmaster API |
-| `YANDEX_WEBMASTER_HOST_URL` | Нет | URL сайта по умолчанию (например, `https://example.com`). Сокращает количество API-запросов — не нужно каждый раз указывать host_id |
+| `YANDEX_WEBMASTER_OAUTH_TOKEN` | Yes | OAuth token for Yandex Webmaster API |
+| `YANDEX_WEBMASTER_HOST_URL` | No | Default host URL (e.g. `https://example.com`) to reduce API calls |
 
 ### Получение OAuth-токена
 
 1. Перейдите на [oauth.yandex.ru/client/new](https://oauth.yandex.ru/client/new)
-2. Создайте приложение с правами:
-   - `webmaster:verify` — верификация сайтов
-   - `webmaster:hostinfo` — доступ к информации о сайтах
-3. После создания приложения получите токен:
+2. Создайте приложение:
+   - Укажите название (любое, например «Webmaster MCP»)
+   - В разделе «Доступ к данным» добавьте права:
+     - `webmaster:verify` — верификация сайтов
+     - `webmaster:hostinfo` — доступ к информации о сайтах
+   - Нажмите «Создать приложение»
+   - Скопируйте **ClientID** из созданного приложения
+3. Откройте в браузере ссылку для получения токена (подставьте свой ClientID):
    ```
-   https://oauth.yandex.ru/authorize?response_type=token&client_id=ID_ВАШЕГО_ПРИЛОЖЕНИЯ
+   https://oauth.yandex.ru/authorize?response_type=token&client_id=ВАШ_CLIENT_ID
    ```
-4. Установите токен в переменную окружения `YANDEX_WEBMASTER_OAUTH_TOKEN`
+4. Авторизуйтесь и разрешите доступ приложению
+5. Яндекс перенаправит на страницу с токеном — скопируйте значение **access_token** из адресной строки
+6. Установите токен в переменную окружения `YANDEX_WEBMASTER_OAUTH_TOKEN`
 
-## Использование
+## Usage
 
-### Режим stdio (по умолчанию)
+### stdio mode (default)
 
 ```bash
-YANDEX_WEBMASTER_OAUTH_TOKEN=ваш-токен node dist/index.js
+YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js
 ```
 
-### Режим HTTP
+### HTTP mode
 
 ```bash
-YANDEX_WEBMASTER_OAUTH_TOKEN=ваш-токен node dist/index.js --http --port=3000
+YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js --http --port=3000
 ```
 
-### Конфигурация MCP-клиента
+### MCP Client Configuration
 
-Для Claude Desktop, Cursor, Cline или `.mcp.json`:
+For Claude Desktop or `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "yandex-webmaster": {
-      "command": "npx",
-      "args": ["-y", "yandex-webmaster-mcp-server"],
+      "command": "node",
+      "args": ["path/to/dist/index.js"],
       "env": {
-        "YANDEX_WEBMASTER_OAUTH_TOKEN": "ваш-токен",
-        "YANDEX_WEBMASTER_HOST_URL": "https://example.com"
+        "YANDEX_WEBMASTER_OAUTH_TOKEN": "your-token"
       }
     }
   }
 }
 ```
 
-## Доступные инструменты
+## Available Tools
 
-### Основные
+### Core
 
-| Инструмент | Описание | Тип |
+| Tool | Description | Type |
 |---|---|---|
-| `ywm_get_user` | Информация о текущем пользователе | Чтение |
-| `ywm_list_hosts` | Список всех зарегистрированных сайтов | Чтение |
-| `ywm_get_host` | Информация о сайте | Чтение |
-| `ywm_add_host` | Добавить сайт | Запись |
-| `ywm_delete_host` | Удалить сайт | Запись |
-| `ywm_get_host_summary` | Сводка по сайту (ИКС, количество страниц, проблемы) | Чтение |
-| `ywm_get_verification` | Статус верификации | Чтение |
-| `ywm_verify_host` | Запустить верификацию сайта | Запись |
-| `ywm_get_diagnostics` | Диагностика сайта | Чтение |
-| `ywm_list_owners` | Список владельцев сайта | Чтение |
+| `ywm_get_user` | Get current user info | Read |
+| `ywm_list_hosts` | List all registered hosts | Read |
+| `ywm_get_host` | Get host details | Read |
+| `ywm_add_host` | Add a new host | Mutating |
+| `ywm_delete_host` | Delete a host | Mutating |
+| `ywm_get_host_summary` | Get host summary (SQI, page counts, problems) | Read |
+| `ywm_get_verification` | Get verification status | Read |
+| `ywm_verify_host` | Start host verification | Mutating |
+| `ywm_get_diagnostics` | Get site diagnostics | Read |
+| `ywm_list_owners` | List host owners | Read |
 
-### Контент
+### Content
 
-| Инструмент | Описание | Тип |
+| Tool | Description | Type |
 |---|---|---|
-| `ywm_list_sitemaps` | Список карт сайта | Чтение |
-| `ywm_get_sitemap` | Информация о карте сайта | Чтение |
-| `ywm_add_sitemap` | Добавить карту сайта | Запись |
-| `ywm_delete_sitemap` | Удалить карту сайта | Запись |
-| `ywm_get_indexing_status` | Текущий статус индексации | Чтение |
-| `ywm_get_indexing_history` | История индексации | Чтение |
-| `ywm_get_search_urls` | URL, найденные в поиске | Чтение |
-| `ywm_get_important_urls` | Важные URL с проблемами | Чтение |
+| `ywm_list_sitemaps` | List all sitemaps | Read |
+| `ywm_get_sitemap` | Get sitemap details | Read |
+| `ywm_add_sitemap` | Add a new sitemap | Mutating |
+| `ywm_delete_sitemap` | Delete a sitemap | Mutating |
+| `ywm_get_indexing_status` | Get current indexing status | Read |
+| `ywm_get_indexing_history` | Get indexing history over time | Read |
+| `ywm_get_search_urls` | Get URLs found in search | Read |
+| `ywm_get_important_urls` | Get important URLs with issues | Read |
 
-### Аналитика
+### Analytics
 
-| Инструмент | Описание | Тип |
+| Tool | Description | Type |
 |---|---|---|
-| `ywm_get_search_queries` | История поисковых запросов | Чтение |
-| `ywm_get_popular_queries` | Популярные поисковые запросы | Чтение |
-| `ywm_get_backlinks` | Сводка по обратным ссылкам | Чтение |
-| `ywm_get_external_links` | Примеры внешних ссылок | Чтение |
-| `ywm_get_sqi` | Текущий ИКС (индекс качества сайта) | Чтение |
-| `ywm_get_sqi_history` | История ИКС | Чтение |
+| `ywm_get_search_queries` | Get search query analytics history | Read |
+| `ywm_get_popular_queries` | Get popular search queries | Read |
+| `ywm_get_backlinks` | Get backlinks summary | Read |
+| `ywm_get_external_links` | Get external link samples | Read |
+| `ywm_get_sqi` | Get current SQI (Site Quality Index) | Read |
+| `ywm_get_sqi_history` | Get SQI history over time | Read |
 
-### Действия
+### Actions
 
-| Инструмент | Описание | Тип |
+| Tool | Description | Type |
 |---|---|---|
-| `ywm_get_recrawl_quota` | Квота на переобход | Чтение |
-| `ywm_list_recrawl_tasks` | Список задач на переобход | Чтение |
-| `ywm_submit_recrawl` | Отправить URL на переобход | Запись |
-| `ywm_get_original_texts` | Список оригинальных текстов | Чтение |
-| `ywm_add_original_text` | Добавить оригинальный текст | Запись |
-| `ywm_delete_original_text` | Удалить оригинальный текст | Запись |
-| `ywm_get_original_text_quota` | Квота на оригинальные тексты | Чтение |
+| `ywm_get_recrawl_quota` | Get recrawl quota | Read |
+| `ywm_list_recrawl_tasks` | List recrawl tasks | Read |
+| `ywm_submit_recrawl` | Submit URL for recrawling | Mutating |
+| `ywm_get_original_texts` | List original texts | Read |
+| `ywm_add_original_text` | Add an original text | Mutating |
+| `ywm_delete_original_text` | Delete an original text | Mutating |
+| `ywm_get_original_text_quota` | Get original text quota | Read |
 
-## Разработка
+## Development
 
 ```bash
-pnpm install          # Установка зависимостей
-pnpm dev              # Запуск в режиме разработки (watch)
-pnpm build            # Сборка для продакшена
-pnpm test             # Запуск тестов
-pnpm test:watch       # Запуск тестов в watch-режиме
+pnpm install          # Install dependencies
+pnpm dev              # Run in development mode (watch)
+pnpm build            # Build for production
+pnpm test             # Run tests
+pnpm test:watch       # Run tests in watch mode
 ```
 
-## Лицензия
+## License
 
 MIT
