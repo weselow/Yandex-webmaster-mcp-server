@@ -19,7 +19,7 @@ if (isHttp) {
   const portArg = args.find((arg) => arg.startsWith('--port='));
   const port = portArg ? parseInt(portArg.split('=')[1], 10) : 3000;
 
-  const server = createServer(token);
+  const server = await createServer(token);
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: () => randomUUID(),
   });
@@ -31,7 +31,7 @@ if (isHttp) {
     console.error(`Yandex Webmaster MCP server listening on http://localhost:${port}`);
   });
 } else {
-  const server = createServer(token);
+  const server = await createServer(token);
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error('Yandex Webmaster MCP server running on stdio');

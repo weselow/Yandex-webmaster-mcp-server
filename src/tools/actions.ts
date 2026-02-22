@@ -1,20 +1,8 @@
 import { z } from 'zod';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { YandexWebmasterClient } from '../client/yandex-webmaster-client.js';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { YandexWebmasterClient } from '../client/index.js';
 import { optionalHostIdSchema } from '../utils/schemas.js';
-
-function errorResponse(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  return { content: [{ type: 'text' as const, text: `Error: ${message}` }], isError: true };
-}
-
-function jsonResponse(data: unknown) {
-  return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
-}
-
-function successResponse(message: string) {
-  return { content: [{ type: 'text' as const, text: message }] };
-}
+import { errorResult, jsonResult, textResult } from '../utils/tool-response.js';
 
 export function registerActionTools(server: McpServer, client: YandexWebmasterClient): void {
   // --- Recrawl tools ---
@@ -27,9 +15,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getRecrawlQuota(hostId);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -42,9 +30,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.listRecrawlTasks(hostId);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -60,9 +48,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.addRecrawlTask(hostId, params.url);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -84,9 +72,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
           offset: params.offset,
           limit: params.limit,
         });
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -102,9 +90,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.addOriginalText(hostId, params.content);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -120,9 +108,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         await client.deleteOriginalText(hostId, params.text_id);
-        return successResponse('Successfully deleted.');
+        return textResult('Successfully deleted.');
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -135,9 +123,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getOriginalTextQuota(hostId);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -155,9 +143,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getRecrawlTask(hostId, params.task_id);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -172,9 +160,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.listFeeds(hostId);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -190,9 +178,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.startFeedUpload(hostId, { url: params.url });
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -205,9 +193,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getFeedUploadStatus(hostId);
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -223,9 +211,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.batchAddFeeds(hostId, { urls: params.urls });
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );
@@ -241,9 +229,9 @@ export function registerActionTools(server: McpServer, client: YandexWebmasterCl
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.batchRemoveFeeds(hostId, { urls: params.urls });
-        return jsonResponse(result);
+        return jsonResult(result);
       } catch (error) {
-        return errorResponse(error);
+        return errorResult(error);
       }
     },
   );

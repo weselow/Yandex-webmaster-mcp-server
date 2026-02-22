@@ -282,6 +282,25 @@ export interface QueryAnalyticsResult {
   count?: number;
 }
 
+// --- History (generic for endpoints returning { history: [...] }) ---
+
+export interface HistoryEntry {
+  date: string;
+  [key: string]: unknown;
+}
+
+export interface HistoryResponse {
+  history: HistoryEntry[];
+}
+
+// --- Batch Feed Operations ---
+
+export interface BatchFeedResult {
+  feeds_added?: number;
+  feeds_removed?: number;
+  [key: string]: unknown;
+}
+
 // --- Request parameter types ---
 
 export interface DateRange {

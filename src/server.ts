@@ -5,7 +5,7 @@ import { registerContentTools } from './tools/content.js';
 import { registerAnalyticsTools } from './tools/analytics.js';
 import { registerActionTools } from './tools/actions.js';
 
-export function createServer(token: string): McpServer {
+export async function createServer(token: string): Promise<McpServer> {
   const server = new McpServer({
     name: 'yandex-webmaster-mcp-server',
     version: '1.0.0',
@@ -15,9 +15,12 @@ export function createServer(token: string): McpServer {
 
   const hostUrl = process.env.YANDEX_WEBMASTER_HOST_URL;
   if (hostUrl) {
-    client.resolveDefaultHost(hostUrl).catch((err: Error) => {
-      console.error('Failed to resolve default host:', err.message);
-    });
+    try {
+      await client.resolveDefaultHost(hostUrl);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`Warning: failed to resolve default host: ${message}`);
+    }
   }
 
   registerCoreTools(server, client);

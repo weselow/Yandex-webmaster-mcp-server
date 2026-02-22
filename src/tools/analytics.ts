@@ -1,20 +1,12 @@
 import { z } from 'zod';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { YandexWebmasterClient } from '../client/yandex-webmaster-client.js';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { YandexWebmasterClient } from '../client/index.js';
 import {
   optionalHostIdSchema,
   queryIndicatorSchema,
   deviceTypeSchema,
 } from '../utils/schemas.js';
-
-function errorResult(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  return { content: [{ type: 'text' as const, text: `Error: ${message}` }], isError: true };
-}
-
-function jsonResult(data: unknown) {
-  return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
-}
+import { errorResult, jsonResult } from '../utils/tool-response.js';
 
 export function registerAnalyticsTools(
   server: McpServer,

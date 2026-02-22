@@ -23,7 +23,7 @@ describe('Server integration', () => {
   let serverTransport: InstanceType<typeof InMemoryTransport>;
 
   beforeAll(async () => {
-    const server = createServer('test-token');
+    const server = await createServer('test-token');
     mcpClient = new Client({ name: 'integration-test', version: '1.0.0' });
 
     [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -39,8 +39,8 @@ describe('Server integration', () => {
     await serverTransport.close();
   });
 
-  it('creates a server successfully with a token', () => {
-    const server = createServer('another-token');
+  it('creates a server successfully with a token', async () => {
+    const server = await createServer('another-token');
     expect(server).toBeDefined();
   });
 

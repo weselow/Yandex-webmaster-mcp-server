@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { YandexWebmasterClient } from '../client/index.js';
 import { optionalHostIdSchema } from '../utils/schemas.js';
+import { errorResult, jsonResult, textResult } from '../utils/tool-response.js';
 
 export function registerContentTools(server: McpServer, client: YandexWebmasterClient): void {
   // --- Sitemaps ---
@@ -14,10 +15,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.listSitemaps(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -33,10 +33,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getSitemap(hostId, params.sitemap_id);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -52,10 +51,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.addSitemap(hostId, params.url);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -71,10 +69,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
       try {
         const hostId = client.resolveHostId(params.host_id);
         await client.deleteSitemap(hostId, params.sitemap_id);
-        return { content: [{ type: 'text', text: 'Sitemap deleted successfully' }] };
+        return textResult('Sitemap deleted successfully');
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -96,10 +93,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           date_from: params.date_from,
           date_to: params.date_to,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -121,10 +117,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           offset: params.offset,
           limit: params.limit,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -146,10 +141,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           offset: params.offset,
           limit: params.limit,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -171,10 +165,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           offset: params.offset,
           limit: params.limit,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -194,10 +187,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           date_from: params.date_from,
           date_to: params.date_to,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -219,10 +211,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           date_from: params.date_from,
           date_to: params.date_to,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -244,10 +235,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           offset: params.offset,
           limit: params.limit,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -269,10 +259,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           date_from: params.date_from,
           date_to: params.date_to,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -294,10 +283,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           offset: params.offset,
           limit: params.limit,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -317,10 +305,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
           date_from: params.date_from,
           date_to: params.date_to,
         });
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -335,10 +322,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.listUserSitemaps(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -354,10 +340,9 @@ export function registerContentTools(server: McpServer, client: YandexWebmasterC
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getUserSitemap(hostId, params.sitemap_id);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );

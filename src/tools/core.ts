@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { YandexWebmasterClient } from '../client/index.js';
 import { optionalHostIdSchema } from '../utils/schemas.js';
+import { errorResult, jsonResult, textResult } from '../utils/tool-response.js';
 
 export function registerCoreTools(server: McpServer, client: YandexWebmasterClient): void {
   server.tool(
@@ -11,10 +12,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
     async () => {
       try {
         const result = await client.getUser();
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -26,10 +26,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
     async () => {
       try {
         const result = await client.listHosts();
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -42,10 +41,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getHost(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -57,10 +55,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
     async (params) => {
       try {
         const result = await client.addHost(params.host_url);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -72,10 +69,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
     async (params) => {
       try {
         await client.deleteHost(params.host_id);
-        return { content: [{ type: 'text', text: 'Host deleted successfully' }] };
+        return textResult('Host deleted successfully');
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -88,10 +84,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getHostSummary(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -104,10 +99,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getVerificationStatus(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -123,10 +117,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.verifyHost(hostId, params.verification_type);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -139,10 +132,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.getDiagnostics(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );
@@ -155,10 +147,9 @@ export function registerCoreTools(server: McpServer, client: YandexWebmasterClie
       try {
         const hostId = client.resolveHostId(params.host_id);
         const result = await client.listOwners(hostId);
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return jsonResult(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+        return errorResult(error);
       }
     },
   );

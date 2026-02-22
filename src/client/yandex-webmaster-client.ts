@@ -28,10 +28,12 @@ import type {
   FeedUploadStatus,
   QueryAnalyticsRequest,
   QueryAnalyticsResult,
+  HistoryResponse,
+  BatchFeedResult,
   DateRange,
   Pagination,
 } from './types.js';
-import { buildQueryString } from '../utils/pagination.js';
+import { buildQueryString, buildPaginationParams, buildDateRangeParams, mergeParams } from '../utils/pagination.js';
 
 const DEFAULT_BASE_URL = 'https://api.webmaster.yandex.net/v4';
 
@@ -245,9 +247,9 @@ export class YandexWebmasterClient {
     return this.get<SearchUrlList>(`/hosts/${hostId}/search-urls/in-search/samples${qs}`);
   }
 
-  async getSearchUrlsHistory(hostId: string, params?: DateRange): Promise<unknown> {
+  async getSearchUrlsHistory(hostId: string, params?: DateRange): Promise<HistoryResponse> {
     const qs = buildQueryString(undefined, params);
-    return this.get<unknown>(`/hosts/${hostId}/search-urls/in-search/history${qs}`);
+    return this.get<HistoryResponse>(`/hosts/${hostId}/search-urls/in-search/history${qs}`);
   }
 
   async getSearchEventsSamples(hostId: string, params?: Pagination): Promise<SearchEventList> {
@@ -255,9 +257,9 @@ export class YandexWebmasterClient {
     return this.get<SearchEventList>(`/hosts/${hostId}/search-urls/events/samples${qs}`);
   }
 
-  async getSearchEventsHistory(hostId: string, params?: DateRange): Promise<unknown> {
+  async getSearchEventsHistory(hostId: string, params?: DateRange): Promise<HistoryResponse> {
     const qs = buildQueryString(undefined, params);
-    return this.get<unknown>(`/hosts/${hostId}/search-urls/events/history${qs}`);
+    return this.get<HistoryResponse>(`/hosts/${hostId}/search-urls/events/history${qs}`);
   }
 
   // --- Important URLs ---
@@ -267,47 +269,46 @@ export class YandexWebmasterClient {
     return this.get<ImportantUrlList>(`/hosts/${hostId}/important-urls${qs}`);
   }
 
-  async getImportantUrlsHistory(hostId: string, params?: DateRange): Promise<unknown> {
+  async getImportantUrlsHistory(hostId: string, params?: DateRange): Promise<HistoryResponse> {
     const qs = buildQueryString(undefined, params);
-    return this.get<unknown>(`/hosts/${hostId}/important-urls/history${qs}`);
+    return this.get<HistoryResponse>(`/hosts/${hostId}/important-urls/history${qs}`);
   }
 
   // --- Search Queries ---
 
   async getSearchQueries(hostId: string, params: SearchQueryParams): Promise<SearchQueryResult> {
-    const qs = this.buildSearchQueryParams(params);
+    const qs = this.buildSearchQueryString(params);
     return this.get<SearchQueryResult>(`/hosts/${hostId}/search-queries/all/history${qs}`);
   }
 
   async getPopularQueries(hostId: string, params: SearchQueryParams): Promise<SearchQueryResult> {
-    const qs = this.buildSearchQueryParams(params);
+    const qs = this.buildSearchQueryString(params);
     return this.get<SearchQueryResult>(`/hosts/${hostId}/search-queries/popular${qs}`);
   }
 
-  async getQueryHistory(hostId: string, queryId: string, params: SearchQueryParams): Promise<unknown> {
-    const qs = this.buildSearchQueryParams(params);
-    return this.get<unknown>(`/hosts/${hostId}/search-queries/${queryId}/history${qs}`);
+  async getQueryHistory(hostId: string, queryId: string, params: SearchQueryParams): Promise<SearchQueryResult> {
+    const qs = this.buildSearchQueryString(params);
+    return this.get<SearchQueryResult>(`/hosts/${hostId}/search-queries/${queryId}/history${qs}`);
   }
 
   async queryAnalytics(hostId: string, body: QueryAnalyticsRequest): Promise<QueryAnalyticsResult> {
     return this.post<QueryAnalyticsResult>(`/hosts/${hostId}/query-analytics/list`, body);
   }
 
-  private buildSearchQueryParams(params: SearchQueryParams): string {
-    const sp = new URLSearchParams();
-    sp.set('date_from', params.date_from);
-    sp.set('date_to', params.date_to);
-    sp.set('query_indicator', params.query_indicator);
+  private buildSearchQueryString(params: SearchQueryParams): string {
+    const extra = new URLSearchParams();
+    extra.set('query_indicator', params.query_indicator);
     if (params.device_type_indicator) {
-      sp.set('device_type_indicator', params.device_type_indicator);
+      extra.set('device_type_indicator', params.device_type_indicator);
     }
-    if (params.offset !== undefined && params.offset > 0) {
-      sp.set('offset', String(params.offset));
-    }
-    if (params.limit !== undefined) {
-      sp.set('limit', String(params.limit));
-    }
-    return `?${sp.toString()}`;
+
+    const merged = mergeParams(
+      buildPaginationParams(params),
+      buildDateRangeParams(params),
+      extra,
+    );
+
+    return `?${merged.toString()}`;
   }
 
   // --- External Links ---
@@ -317,9 +318,9 @@ export class YandexWebmasterClient {
     return this.get<ExternalLinkList>(`/hosts/${hostId}/links/external/samples${qs}`);
   }
 
-  async getExternalLinksHistory(hostId: string, params?: DateRange): Promise<unknown> {
+  async getExternalLinksHistory(hostId: string, params?: DateRange): Promise<HistoryResponse> {
     const qs = buildQueryString(undefined, params);
-    return this.get<unknown>(`/hosts/${hostId}/links/external/history${qs}`);
+    return this.get<HistoryResponse>(`/hosts/${hostId}/links/external/history${qs}`);
   }
 
   // --- Broken Internal Links ---
@@ -329,9 +330,9 @@ export class YandexWebmasterClient {
     return this.get<BrokenLinkList>(`/hosts/${hostId}/links/internal/broken/samples${qs}`);
   }
 
-  async getBrokenLinksHistory(hostId: string, params?: DateRange): Promise<unknown> {
+  async getBrokenLinksHistory(hostId: string, params?: DateRange): Promise<HistoryResponse> {
     const qs = buildQueryString(undefined, params);
-    return this.get<unknown>(`/hosts/${hostId}/links/internal/broken/history${qs}`);
+    return this.get<HistoryResponse>(`/hosts/${hostId}/links/internal/broken/history${qs}`);
   }
 
   // --- SQI ---
@@ -379,12 +380,12 @@ export class YandexWebmasterClient {
     return this.get<FeedUploadStatus>(`/hosts/${hostId}/feeds/add/info`);
   }
 
-  async batchAddFeeds(hostId: string, body: { urls: string[] }): Promise<unknown> {
-    return this.post<unknown>(`/hosts/${hostId}/feeds/batch/add`, body);
+  async batchAddFeeds(hostId: string, body: { urls: string[] }): Promise<BatchFeedResult> {
+    return this.post<BatchFeedResult>(`/hosts/${hostId}/feeds/batch/add`, body);
   }
 
-  async batchRemoveFeeds(hostId: string, body: { urls: string[] }): Promise<unknown> {
-    return this.delWithBody<unknown>(`/hosts/${hostId}/feeds/batch/remove`, body);
+  async batchRemoveFeeds(hostId: string, body: { urls: string[] }): Promise<BatchFeedResult> {
+    return this.delWithBody<BatchFeedResult>(`/hosts/${hostId}/feeds/batch/remove`, body);
   }
 
   // --- Original Texts ---
