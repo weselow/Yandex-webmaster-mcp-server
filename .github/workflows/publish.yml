@@ -11,15 +11,6 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - name: Check NPM_TOKEN secret
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -z "$NPM_TOKEN" ]; then
-            echo "::error::NPM_TOKEN secret is not set. Go to repo Settings → Secrets → Actions → New repository secret and add your npm Access Token as NPM_TOKEN."
-            exit 1
-          fi
-
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
@@ -38,5 +29,3 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
