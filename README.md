@@ -1,5 +1,8 @@
 # Yandex Webmaster MCP Server
 
+[![npm version](https://img.shields.io/npm/v/yandex-webmaster-mcp-server)](https://www.npmjs.com/package/yandex-webmaster-mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 MCP-сервер для [Yandex Webmaster API v4](https://yandex.ru/dev/webmaster/doc/dg/reference/host-id.html). Предоставляет **46 инструментов** для управления сайтами, картами сайтов, индексацией, поисковой аналитикой, обратными ссылками, фидами и многим другим через Model Context Protocol.
 
 ## Возможности
@@ -35,10 +38,17 @@ MCP-сервер для [Yandex Webmaster API v4](https://yandex.ru/dev/webmaste
 
 ## Установка
 
-### Через npx (рекомендуется)
+### Через npx (без установки)
 
 ```bash
-npx yandex-webmaster-mcp-server
+npx -y yandex-webmaster-mcp-server
+```
+
+### Глобальная установка
+
+```bash
+npm install -g yandex-webmaster-mcp-server
+yandex-webmaster-mcp-server
 ```
 
 ### Из исходников
@@ -82,13 +92,13 @@ pnpm build
 ### Режим stdio (по умолчанию)
 
 ```bash
-YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js
+YANDEX_WEBMASTER_OAUTH_TOKEN=your-token npx -y yandex-webmaster-mcp-server
 ```
 
 ### HTTP-режим
 
 ```bash
-YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js --http --port=3000
+YANDEX_WEBMASTER_OAUTH_TOKEN=your-token npx -y yandex-webmaster-mcp-server --http --port=3000
 ```
 
 ### Настройка MCP-клиента
