@@ -20,12 +20,12 @@ if (isHttp) {
   const port = portArg ? parseInt(portArg.split('=')[1], 10) : 3000;
 
   const server = createServer(token);
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: () => randomUUID(),
+  });
+  await server.connect(transport);
 
   createHttpServer(async (req, res) => {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-    });
-    await server.connect(transport);
     await transport.handleRequest(req, res);
   }).listen(port, () => {
     console.error(`Yandex Webmaster MCP server listening on http://localhost:${port}`);
