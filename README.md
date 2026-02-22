@@ -9,6 +9,18 @@ MCP-сервер для [Yandex Webmaster API v4](https://yandex.ru/dev/webmaste
 - **Analytics** --- поисковые запросы, популярные запросы, внешние ссылки, SQI, аналитика запросов
 - **Actions** --- переобход страниц, оригинальные тексты, управление фидами
 
+### Примеры промптов
+
+- «Покажи список всех моих сайтов в Яндекс Вебмастере»
+- «Какие проблемы обнаружены на сайте dellshop.ru?»
+- «Найди страницы, исключённые из поиска как малоценные»
+- «Покажи историю SQI за последние 3 месяца»
+- «Какие внешние ссылки ведут на мой сайт?»
+- «Есть ли битые внутренние ссылки на сайте?»
+- «Покажи популярные поисковые запросы за последнюю неделю»
+- «Отправь главную страницу на переобход»
+- «Сколько страниц проиндексировано и какие HTTP-коды возвращают?»
+
 ## Установка
 
 ### Через npx (рекомендуется)
@@ -78,12 +90,15 @@ YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js --http --port=3000
       "command": "npx",
       "args": ["-y", "yandex-webmaster-mcp-server"],
       "env": {
-        "YANDEX_WEBMASTER_OAUTH_TOKEN": "your-token"
+        "YANDEX_WEBMASTER_OAUTH_TOKEN": "your-token",
+        "YANDEX_WEBMASTER_HOST_URL": "https://example.com"
       }
     }
   }
 }
 ```
+
+> `YANDEX_WEBMASTER_HOST_URL` --- необязательная переменная. Если указать URL вашего основного сайта, сервер будет использовать его по умолчанию во всех запросах. Это сокращает количество API-вызовов и экономит токены, так как не нужно каждый раз передавать `host_id`.
 
 Или, если установлено из исходников:
 
@@ -94,7 +109,8 @@ YANDEX_WEBMASTER_OAUTH_TOKEN=your-token node dist/index.js --http --port=3000
       "command": "node",
       "args": ["path/to/dist/index.js"],
       "env": {
-        "YANDEX_WEBMASTER_OAUTH_TOKEN": "your-token"
+        "YANDEX_WEBMASTER_OAUTH_TOKEN": "your-token",
+        "YANDEX_WEBMASTER_HOST_URL": "https://example.com"
       }
     }
   }
