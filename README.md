@@ -27,17 +27,23 @@ pnpm build
 | `YANDEX_WEBMASTER_OAUTH_TOKEN` | Yes | OAuth token for Yandex Webmaster API |
 | `YANDEX_WEBMASTER_HOST_URL` | No | Default host URL (e.g. `https://example.com`) to reduce API calls |
 
-### Getting an OAuth Token
+### Получение OAuth-токена
 
-1. Go to [https://oauth.yandex.ru/client/new](https://oauth.yandex.ru/client/new)
-2. Create an application with the following scopes:
-   - `webmaster:verify` --- site verification
-   - `webmaster:hostinfo` --- host information access
-3. After creating the app, obtain a token:
+1. Перейдите на [oauth.yandex.ru/client/new](https://oauth.yandex.ru/client/new)
+2. Создайте приложение:
+   - Укажите название (любое, например «Webmaster MCP»)
+   - В разделе «Доступ к данным» добавьте права:
+     - `webmaster:verify` — верификация сайтов
+     - `webmaster:hostinfo` — доступ к информации о сайтах
+   - Нажмите «Создать приложение»
+   - Скопируйте **ClientID** из созданного приложения
+3. Откройте в браузере ссылку для получения токена (подставьте свой ClientID):
    ```
-   https://oauth.yandex.ru/authorize?response_type=token&client_id=YOUR_APP_ID
+   https://oauth.yandex.ru/authorize?response_type=token&client_id=ВАШ_CLIENT_ID
    ```
-4. Set the token as `YANDEX_WEBMASTER_OAUTH_TOKEN` environment variable.
+4. Авторизуйтесь и разрешите доступ приложению
+5. Яндекс перенаправит на страницу с токеном — скопируйте значение **access_token** из адресной строки
+6. Установите токен в переменную окружения `YANDEX_WEBMASTER_OAUTH_TOKEN`
 
 ## Usage
 
