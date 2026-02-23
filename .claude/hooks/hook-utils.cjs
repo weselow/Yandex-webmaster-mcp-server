@@ -11,6 +11,9 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// Module-level permission mode — set by readStdinJSON(), read by deny()/ask()
+let _permissionMode = '';
+
 // ---------------------------------------------------------------------------
 // Stdin
 // ---------------------------------------------------------------------------
@@ -22,7 +25,9 @@ const path = require('path');
 function readStdinJSON() {
   try {
     const raw = fs.readFileSync(0, 'utf8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    _permissionMode = parsed.permission_mode || '';
+    return parsed;
   } catch {
     return {};
   }
@@ -51,6 +56,11 @@ function getField(obj, dotPath) {
 // ---------------------------------------------------------------------------
 
 function deny(reason) {
+  // In bypass mode (--dangerously-skip-permissions), convert deny to warning
+  if (_permissionMode === 'bypassPermissions') {
+    process.stdout.write(`[HOOK WARNING — would deny] ${reason}\n`);
+    process.exit(0);
+  }
   const out = {
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',
@@ -63,6 +73,8 @@ function deny(reason) {
 }
 
 function ask(reason) {
+  // In bypass mode, skip ask entirely (allow the action)
+  if (_permissionMode === 'bypassPermissions') process.exit(0);
   const out = {
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',
@@ -84,6 +96,11 @@ function approve() {
 }
 
 function block(reason) {
+  // In bypass mode, convert block to approve with warning
+  if (_permissionMode === 'bypassPermissions') {
+    process.stdout.write(`[HOOK WARNING — would block] ${reason}\n`);
+    approve();
+  }
   const out = { decision: 'block', reason };
   process.stdout.write(JSON.stringify(out));
   process.exit(0);
@@ -201,6 +218,38 @@ function containsPathSegment(filePath, segment) {
 }
 
 // ---------------------------------------------------------------------------
+// Subagent detection
+// ---------------------------------------------------------------------------
+
+/**
+ * Detect whether the current tool call originates from a subagent.
+ * Subagents get full tool access — orchestrator restrictions don't apply.
+ *
+ * Checks transcript_path + tool_use_id against the subagents directory.
+ * Returns false on any error (fail-open: treat as orchestrator).
+ */
+function isSubagent(input) {
+  const transcriptPath = getField(input, 'transcript_path');
+  const toolUseId = getField(input, 'tool_use_id');
+  if (!transcriptPath || !toolUseId) return false;
+
+  const sessionDir = transcriptPath.replace(/\.jsonl$/, '');
+  const subagentsDir = path.join(sessionDir, 'subagents');
+
+  try {
+    const files = fs.readdirSync(subagentsDir)
+      .filter(f => f.startsWith('agent-') && f.endsWith('.jsonl'));
+    for (const f of files) {
+      const content = fs.readFileSync(path.join(subagentsDir, f), 'utf8');
+      if (content.includes(`"id":"${toolUseId}"`)) return true;
+    }
+  } catch {
+    // No subagents dir or read error — treat as orchestrator
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------------------
 // Error logging
 // ---------------------------------------------------------------------------
 
@@ -260,6 +309,7 @@ module.exports = {
   parseBeadId,
   parseEpicId,
   containsPathSegment,
+  isSubagent,
   logError,
   runHook,
 };

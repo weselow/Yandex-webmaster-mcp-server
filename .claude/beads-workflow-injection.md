@@ -6,22 +6,14 @@
    - BEAD_ID: Your task ID (e.g., BD-001 for standalone, BD-001.2 for epic child)
    - EPIC_ID: (epic children only) The parent epic ID (e.g., BD-001)
 
-2. **Create worktree (via API with git fallback):**
+2. **Create worktree:**
    ```bash
    REPO_ROOT=$(git rev-parse --show-toplevel)
    WORKTREE_PATH="$REPO_ROOT/.worktrees/bd-{BEAD_ID}"
 
-   # Try API first (requires beads-kanban-ui running)
-   API_RESPONSE=$(curl -s -X POST http://localhost:3008/api/git/worktree \
-     -H "Content-Type: application/json" \
-     -d '{"repo_path": "'$REPO_ROOT'", "bead_id": "{BEAD_ID}"}' 2>/dev/null)
-
-   # Fallback to git if API unavailable
-   if [[ -z "$API_RESPONSE" ]] || echo "$API_RESPONSE" | grep -q "error"; then
-     mkdir -p "$REPO_ROOT/.worktrees"
-     if [[ ! -d "$WORKTREE_PATH" ]]; then
-       git worktree add "$WORKTREE_PATH" -b bd-{BEAD_ID}
-     fi
+   mkdir -p "$REPO_ROOT/.worktrees"
+   if [[ ! -d "$WORKTREE_PATH" ]]; then
+     git worktree add "$WORKTREE_PATH" -b bd-{BEAD_ID}
    fi
 
    cd "$WORKTREE_PATH"

@@ -1,4 +1,4 @@
-# Yandex-webmaster-mcp-server
+# Yandex Webmaster Mcp Server
 
 ## Project Overview
 
