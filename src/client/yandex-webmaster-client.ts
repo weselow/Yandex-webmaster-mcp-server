@@ -354,12 +354,18 @@ export class YandexWebmasterClient {
     return this.get<RecrawlQuota>(`/hosts/${hostId}/recrawl/quota`);
   }
 
+  // Очередь переобхода живёт по пути `recrawl/queue` — так в документации
+  // Яндекса и для списка (GET), и для отправки (POST). Путь `recrawl/tasks`
+  // отвечал 404 на любом сайте, из-за чего отправить страницу на переобход
+  // было нельзя вовсе; квота по соседнему `recrawl/quota` при этом читалась,
+  // и поломка выглядела как отказ прав. Идентификатор задания читается по
+  // `recrawl/queue/{id}` — он и был единственным верным путём в этой группе.
   async listRecrawlTasks(hostId: string): Promise<RecrawlTaskList> {
-    return this.get<RecrawlTaskList>(`/hosts/${hostId}/recrawl/tasks`);
+    return this.get<RecrawlTaskList>(`/hosts/${hostId}/recrawl/queue`);
   }
 
   async addRecrawlTask(hostId: string, url: string): Promise<RecrawlTask> {
-    return this.post<RecrawlTask>(`/hosts/${hostId}/recrawl/tasks`, { url });
+    return this.post<RecrawlTask>(`/hosts/${hostId}/recrawl/queue`, { url });
   }
 
   async getRecrawlTask(hostId: string, taskId: string): Promise<RecrawlTask> {

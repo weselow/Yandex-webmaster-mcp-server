@@ -366,11 +366,37 @@ describe('YandexWebmasterClient', () => {
 
       expect(result.task_id).toBe('t1');
       expect(fetchMock).toHaveBeenLastCalledWith(
-        'https://api.test.com/v4/user/10/hosts/h1/recrawl/tasks',
+        'https://api.test.com/v4/user/10/hosts/h1/recrawl/queue',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ url: 'https://ex.com/page' }),
         }),
+      );
+    });
+
+    it('listRecrawlTasks reads the recrawl queue path', async () => {
+      fetchMock.mockResolvedValueOnce(mockResponse(200, { tasks: [] }));
+
+      await client.listRecrawlTasks('h1');
+
+      expect(fetchMock).toHaveBeenLastCalledWith(
+        'https://api.test.com/v4/user/10/hosts/h1/recrawl/queue',
+        expect.anything(),
+      );
+    });
+
+    it('getRecrawlTask reads a single task under the queue path', async () => {
+      fetchMock.mockResolvedValueOnce(mockResponse(200, {
+        task_id: 't1',
+        url: 'https://ex.com/page',
+        added_date: '2024-01-01',
+      }));
+
+      await client.getRecrawlTask('h1', 't1');
+
+      expect(fetchMock).toHaveBeenLastCalledWith(
+        'https://api.test.com/v4/user/10/hosts/h1/recrawl/queue/t1',
+        expect.anything(),
       );
     });
 
